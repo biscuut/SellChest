@@ -1,0 +1,15 @@
+name: VoidChest
+version: 1.0
+api-version: 1.13
+main: codes.biscuit.voidchest.VoidChest
+author: Biscut
+description: Automatically sells all items that enter a voidchest.
+depend: [Vault, ShopGUIPlus]
+commands:
+  voidchest:
+    description: The main voidchest command.
+    aliases: [vc]
+permissions:
+  voidchest.admin:
+    description: Acess to the main voidchest command, allowing to reload and give voidchests.
+    default: op

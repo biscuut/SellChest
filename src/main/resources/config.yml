@@ -1,0 +1,51 @@
+###################################################
+#  _    __      _     __________              __  #
+# | |  / /___  (_)___/ / ____/ /_  ___  _____/ /_ #
+# | | / / __ \/ / __  / /   / __ \/ _ \/ ___/ __/ #
+# | |/ / /_/ / / /_/ / /___/ / / /  __(__  ) /_   #
+# |___/\____/_/\__,_/\____/_/ /_/\___/____/\__/   #
+#                                                 #
+#                v1.0 by Biscut                   #
+###################################################
+
+# How often voidchests should sell their contents, in seconds.
+sell-interval: 1.0
+
+# How often voidchest locations should save to config, in seconds (good for when crashes happen).
+save-interval: 300.0
+
+# Set to false if you don't want unsellable items to be cleared.
+remove-unsellable-items: true
+
+money-recipient: 'PLAYER' # or FACTION_LEADER or ISLAND_OWNER
+
+# Customize the voidchest item.
+item:
+  material: 'CHEST'
+  name: '&6&lVoidChest'
+  lore:
+    - '&7Anything placed in this chest will be automatically sold'
+    - '&7according to the shop price and straight into your balance.'
+  glow: false
+
+hooks: # TODO Add hooks, obviouslllyyy
+  essentials: false # Use the worth.yml from Essentials for prices
+  shopguiplus: false # Use prices from ShopGUI+ (can only get prices while the player, faction leader, or island owner is online.)
+  skyblock:
+  factions:
+
+
+# These prices will be used if none of the hooks above are enabled. # TODO <--
+prices:
+  dirt: 1.0
+  bedrock: 2.0
+
+# Customize messages from the plugin.
+messages:
+  voidchest-beside-chest: '&cYou cannot place a voidchest beside another chest!'
+  chest-beside-voidchest: '&cYou cannot place a chest beside a voidchest!'
+  voidchest-removed: '&aVoidchest removed and added to your inventory!'
+  voidchest-remove-nospace: '&cYou must have an empty inventory slot to break this voidchest!'
+  voidchest-remove-notowner: '&cYou cannot destroy a voidchest that is not yours!'
+  voidchest-place: '&aVoidchest placed!'
+  voidchest-receive: '&aYou have received {amount} voidchests!'
