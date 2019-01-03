@@ -1,15 +1,15 @@
 package codes.biscuit.voidchest;
 
-import net.milkbowl.vault.economy.Economy;
+import codes.biscuit.voidchest.commands.VoidChestCommand;
+import codes.biscuit.voidchest.events.OtherEvents;
+import codes.biscuit.voidchest.events.PlayerEvents;
+import codes.biscuit.voidchest.hooks.HookUtils;
+import codes.biscuit.voidchest.utils.ConfigUtils;
+import codes.biscuit.voidchest.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import codes.biscuit.voidchest.events.*;
-import codes.biscuit.voidchest.hooks.ShopGUIPlusHook;
-import codes.biscuit.voidchest.utils.*;
-import codes.biscuit.voidchest.commands.*;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -19,8 +19,7 @@ public class VoidChest extends JavaPlugin {
     private HashMap<Location, OfflinePlayer> voidChests = new HashMap<>();
     private ConfigUtils configUtils;
     private Utils utils;
-    private ShopGUIPlusHook shopGUIHook = null;
-    public Economy economy = null;
+    private HookUtils hookUtils;
 
     @Override
     public void onEnable() {
@@ -29,13 +28,9 @@ public class VoidChest extends JavaPlugin {
         getCommand("voidchest").setExecutor(new VoidChestCommand(this));
         this.configUtils = new ConfigUtils(this);
         this.utils = new Utils(this);
+        this.hookUtils =  new HookUtils(this);
         Bukkit.getPluginManager().registerEvents(new PlayerEvents(this), this);
         Bukkit.getPluginManager().registerEvents(new OtherEvents(this), this);
-        setupEconomy();
-        if (Bukkit.getPluginManager().getPlugin("ShopGUIPlus") != null) {
-            shopGUIHook = new ShopGUIPlusHook();
-            getLogger().info("ShopGUI+ hook enabled!");
-        }
         configUtils.setupVoidChests();
     }
 
@@ -47,14 +42,6 @@ public class VoidChest extends JavaPlugin {
         } catch (IOException ex) {
             ex.printStackTrace();
             getLogger().info("Unable to save voidchest locations!");
-        }
-    }
-
-    private void setupEconomy()
-    {
-        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-        if (economyProvider != null) {
-            this.economy = economyProvider.getProvider();
         }
     }
 
@@ -70,7 +57,7 @@ public class VoidChest extends JavaPlugin {
         return this.voidChests;
     }
 
-    public ShopGUIPlusHook getShopGUIHook() {
-        return this.shopGUIHook;
+    public HookUtils getHookUtils() {
+        return hookUtils;
     }
 }

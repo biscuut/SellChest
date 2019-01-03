@@ -8,6 +8,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -24,29 +25,35 @@ public class PlayerEvents implements Listener {
         this.main = main;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onVoidChestPlace(PlayerInteractEvent e) {
-        if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && e.getItem() != null && main.getUtils().isVoidChest(e.getItem())) {
-            Block newBlock = e.getClickedBlock().getRelative(e.getBlockFace());
-            Block[] surroundingBlocks = {newBlock.getRelative(BlockFace.NORTH),
-                    newBlock.getRelative(BlockFace.EAST),
-                    newBlock.getRelative(BlockFace.SOUTH),
-                    newBlock.getRelative(BlockFace.WEST)};
-            e.setCancelled(true);
-            for (Block currentBlock : surroundingBlocks) {
-                if (currentBlock.getType().equals(Material.CHEST) && !main.getLocations().containsKey(currentBlock.getLocation())) {
-                    if (!main.getConfigUtils().getMessageChestBeside().equals("")) e.getPlayer().sendMessage(main.getConfigUtils().getMessageChestBeside());
-                    return;
+        if (!e.isCancelled()) {
+            if (e.getPlayer().hasPermission("voidchest.place")) {
+                if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && e.getItem() != null && main.getUtils().isVoidChest(e.getItem())) {
+                    Block newBlock = e.getClickedBlock().getRelative(e.getBlockFace());
+                    Block[] surroundingBlocks = {newBlock.getRelative(BlockFace.NORTH),
+                            newBlock.getRelative(BlockFace.EAST),
+                            newBlock.getRelative(BlockFace.SOUTH),
+                            newBlock.getRelative(BlockFace.WEST)};
+                    e.setCancelled(true);
+                    for (Block currentBlock : surroundingBlocks) {
+                        if (currentBlock.getType().equals(Material.CHEST) && !main.getLocations().containsKey(currentBlock.getLocation())) {
+                            if (!main.getConfigUtils().getMessageVoidChestBeside().equals("")) e.getPlayer().sendMessage(main.getConfigUtils().getMessageVoidChestBeside());
+                            return;
+                        }
+                    }
+                    newBlock.setType(Material.CHEST);
+                    if (e.getPlayer().getGameMode().equals(GameMode.SURVIVAL) || e.getPlayer().getGameMode().equals(GameMode.ADVENTURE)) {
+                        ItemStack removeItem = e.getItem();
+                        removeItem.setAmount(e.getItem().getAmount() - 1);
+                        e.getPlayer().setItemInHand(removeItem);
+                    }
+                    main.getUtils().addConfigLocation(newBlock.getLocation(), e.getPlayer());
+                    if (!main.getConfigUtils().getMessagePlace().equals("")) e.getPlayer().sendMessage(main.getConfigUtils().getMessagePlace());
                 }
+            } else {
+                if (!main.getConfigUtils().getNoPermissionPlaceMessage().equals("")) e.getPlayer().sendMessage(main.getConfigUtils().getNoPermissionPlaceMessage());
             }
-            newBlock.setType(Material.CHEST);
-            if (e.getPlayer().getGameMode().equals(GameMode.SURVIVAL) || e.getPlayer().getGameMode().equals(GameMode.ADVENTURE)) {
-                ItemStack removeItem = e.getItem();
-                removeItem.setAmount(e.getItem().getAmount()-1);
-                e.getPlayer().setItemInHand(removeItem);
-            }
-            main.getUtils().addConfigLocation(newBlock.getLocation(), e.getPlayer());
-            if (!main.getConfigUtils().getMessagePlace().equals("")) e.getPlayer().sendMessage(main.getConfigUtils().getMessagePlace());
         }
     }
 

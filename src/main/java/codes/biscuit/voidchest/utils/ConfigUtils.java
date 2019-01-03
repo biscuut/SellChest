@@ -1,5 +1,6 @@
 package codes.biscuit.voidchest.utils;
 
+import codes.biscuit.voidchest.hooks.HookUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -105,6 +106,15 @@ public class ConfigUtils {
         return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.voidchest-place"));
     }
 
+    public String getNoPermissionPlaceMessage() {
+        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.no-permission-place"));
+    }
+
+    public String getNoPermissionCommand() {
+        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.no-permission-command"));
+    }
+
+
     public String getMessageReceive(int giveAmount) {
         String message = ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.voidchest-receive"));
         return message.replace("{amount}", String.valueOf(giveAmount));
@@ -167,5 +177,38 @@ public class ConfigUtils {
         } else {
             return 0;
         }
+    }
+
+    public boolean essentialsHookEnabled() {
+        return main.getConfig().getBoolean("hooks.essentials");
+    }
+
+    public boolean shopGUIPlusHookEnabled() {
+        return main.getConfig().getBoolean("hooks.shopguiplus");
+    }
+
+    public boolean askyblockHookEnabled() {
+        return main.getConfig().getBoolean("hooks.askyblock");
+    }
+
+    public boolean factionsHookEnabled() {
+        return main.getConfig().getBoolean("hooks.factions");
+    }
+
+    public boolean plotSquaredHookEnabled() {
+        return main.getConfig().getBoolean("hooks.plotsquared");
+    }
+
+    public HookUtils.MoneyRecipient getMoneyRecipient() {
+        String rawRecipient = main.getConfig().getString("money-recipient");
+        try {
+            return HookUtils.MoneyRecipient.valueOf(rawRecipient);
+        } catch (Exception ex) {
+            return HookUtils.MoneyRecipient.PLAYER;
+        }
+    }
+
+    public double getConfigPrice(String item) {
+        return main.getConfig().getDouble("prices."+item);
     }
 }

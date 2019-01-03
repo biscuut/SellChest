@@ -70,31 +70,31 @@ public class Utils {
     }
 
     public void runSellTimer() {
-        this.sellTimerID = Bukkit.getScheduler().scheduleSyncRepeatingTask(main, () -> { //TODO double chests sell double?
-            if (!main.getLocations().isEmpty()) {
-                for (Map.Entry<Location, OfflinePlayer> locationEntry : main.getLocations().entrySet()) {
-                    OfflinePlayer offlineP = locationEntry.getValue();
-                    if (offlineP.isOnline()) {
-                        Location loc = locationEntry.getKey();
-                        Player p = offlineP.getPlayer();
-                        if (loc.getBlock().getType().equals(Material.CHEST)) {
-                            Chest voidChest = (Chest)loc.getBlock().getState();
-                            Inventory voidChestInventory = voidChest.getInventory();
-                            for (ItemStack item : voidChestInventory) {
-                                if (item != null && item.getType() != Material.AIR) {
-                                    double sellPrice = main.getShopGUIHook().getSellPrice(p, item);
-                                    if (sellPrice > 0) {
-                                        main.economy.depositPlayer(p, sellPrice);
-                                        if (!main.getConfigUtils().removeUnsellableItems()) {
-                                            voidChestInventory.setItem(voidChestInventory.first(item), new ItemStack(Material.AIR));
-                                        }
-                                    }
-                                }
+        sellTimerID = Bukkit.getScheduler().scheduleSyncRepeatingTask(main, () -> { //TODO double chests sell double?
+            for (Map.Entry<Location, OfflinePlayer> locationEntry : main.getLocations().entrySet()) {
+                OfflinePlayer offlineP = locationEntry.getValue();
+                Location loc = locationEntry.getKey();
+                if (loc.getBlock().getType().equals(Material.CHEST)) {
+                    Chest voidChest = (Chest)loc.getBlock().getState();
+                    Inventory voidChestInventory = voidChest.getInventory();
+                    for (ItemStack item : voidChestInventory) {
+                        if (item != null) {
+                            double sellPrice;
+                            if (offlineP.isOnline()) {
+                                Player p = offlineP.getPlayer();
+                                sellPrice = main.getHookUtils().getValue(item, p);
+                            } else {
+                                sellPrice = main.getHookUtils().getValue(item, null);
                             }
-                            if (main.getConfigUtils().removeUnsellableItems()) {
-                                voidChest.getBlockInventory().clear();
+                            if (sellPrice > 0) {
+                                main.getHookUtils().giveMoney(offlineP, sellPrice, loc);
+                                voidChestInventory.setItem(voidChestInventory.first(item), new ItemStack(Material.AIR));
+                                loc.getBlock().getState().update(); // TODO probably doesnt make a difference
                             }
                         }
+                    }
+                    if (main.getConfigUtils().removeUnsellableItems()) {
+                        voidChest.getBlockInventory().clear();
                     }
                 }
             }
@@ -102,11 +102,11 @@ public class Utils {
     }
 
     public int getSellTimerID() {
-        return this.sellTimerID;
+        return sellTimerID;
     }
 
     public void runSaveTimer() {
-        this.saveTimerID = Bukkit.getScheduler().scheduleSyncRepeatingTask(main, () -> {
+        saveTimerID = Bukkit.getScheduler().scheduleSyncRepeatingTask(main, () -> {
             try {
                 main.getConfigUtils().getLocationsConfig().save(main.getConfigUtils().getLocationsFile());
             } catch (IOException ex) {
@@ -116,7 +116,7 @@ public class Utils {
     }
 
     public int getSaveTimerID() {
-        return this.saveTimerID;
+        return saveTimerID;
     }
 
     private void addGlow(ItemStack item) {

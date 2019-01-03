@@ -16,11 +16,7 @@ public class VoidChestCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player || sender instanceof BlockCommandSender || sender instanceof ConsoleCommandSender) {
-            if (sender instanceof Player && !sender.hasPermission("voidchest.give")) {
-                sender.sendMessage(ChatColor.RED + "No permission!");
-                return false;
-            }
+        if (sender.hasPermission("voidchest.admin")) {
             if (args.length >= 1) {
                 switch (args[0]) {
                     case "give":
@@ -63,14 +59,18 @@ public class VoidChestCommand implements CommandExecutor {
                         sender.sendMessage(ChatColor.GREEN + "Reloaded the config! Most values have been instantly updated.");
                         break;
                     default:
-                        sender.sendMessage(ChatColor.RED + "Invalid argument! /vc [give|reload] [player] [amount]");
+                        sender.sendMessage(ChatColor.RED + "Invalid argument! /vc [give|reload]");
                         break;
                 }
             } else {
-                sender.sendMessage(ChatColor.RED + "You must specify an argument! /vc [give|reload] [player] [amount]");
+                sender.sendMessage(ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "--------------" + ChatColor.GRAY +"[" + ChatColor.GOLD + ChatColor.BOLD + " VoidChest " + ChatColor.GRAY + "]" + ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "--------------");
+                sender.sendMessage(ChatColor.GOLD + "● /vc give <player> [amount] " + ChatColor.GRAY + "- Give a player a voidchest");
+                sender.sendMessage(ChatColor.GOLD + "● /vc reload " + ChatColor.GRAY + "- Reload the config");
+                sender.sendMessage(ChatColor.GRAY.toString() + ChatColor.ITALIC + "v" + main.getDescription().getVersion() + " by Biscut");
+                sender.sendMessage(ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "-----------------------------------------");
             }
         } else {
-            sender.sendMessage(ChatColor.RED + "You cannot use this command through here!");
+            if (!main.getConfigUtils().getNoPermissionCommand().equals("")) sender.sendMessage(main.getConfigUtils().getNoPermissionCommand());
         }
         return false;
     }
