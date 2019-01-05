@@ -7,16 +7,12 @@ import codes.biscuit.voidchest.hooks.HookUtils;
 import codes.biscuit.voidchest.utils.ConfigUtils;
 import codes.biscuit.voidchest.utils.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 public class VoidChest extends JavaPlugin {
 
-    private HashMap<Location, OfflinePlayer> voidChests = new HashMap<>();
     private ConfigUtils configUtils;
     private Utils utils;
     private HookUtils hookUtils;
@@ -51,10 +47,6 @@ public class VoidChest extends JavaPlugin {
 
     public Utils getUtils() {
         return this.utils;
-    }
-
-    public HashMap<Location, OfflinePlayer> getLocations() {
-        return this.voidChests;
     }
 
     public HookUtils getHookUtils() {

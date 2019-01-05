@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -15,6 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +25,7 @@ public class Utils {
     private VoidChest main;
     private int sellTimerID;
     private int saveTimerID;
+    private Map<Location, OfflinePlayer> chestLocations = new HashMap<>();
 
     public Utils(VoidChest main) {
         this.main = main;
@@ -43,8 +46,8 @@ public class Utils {
     }
 
     public void addConfigLocation(Location loc, OfflinePlayer offlineP) {
-        main.getLocations().put(loc, offlineP);
-        String serializedLoc = loc.getWorld().getName() + "!" + loc.getBlockX() + "!" + loc.getBlockY() + "!" + loc.getBlockZ();
+        chestLocations.put(loc, offlineP);
+        String serializedLoc = loc.getWorld().getName() + "|" + loc.getBlockX() + "|" + loc.getBlockY() + "|" + loc.getBlockZ();
         String uuid = offlineP.getUniqueId().toString();
         List<String> locationList;
         if (main.getConfigUtils().getLocationsConfig().isSet("locations." + uuid)) {
@@ -57,8 +60,8 @@ public class Utils {
     }
 
     public void removeConfigLocation(Location loc, OfflinePlayer offlineP) {
-        main.getLocations().remove(loc);
-        String serializedLoc = loc.getWorld().getName() + "!" + loc.getBlockX() + "!" + loc.getBlockY() + "!" + loc.getBlockZ();
+        chestLocations.remove(loc);
+        String serializedLoc = loc.getWorld().getName() + "|" + loc.getBlockX() + "|" + loc.getBlockY() + "|" + loc.getBlockZ();
         String uuid = offlineP.getUniqueId().toString();
         List<String> locationList = main.getConfigUtils().getLocationsConfig().getStringList("locations." + uuid);
         locationList.remove(serializedLoc);
@@ -70,8 +73,8 @@ public class Utils {
     }
 
     public void runSellTimer() {
-        sellTimerID = Bukkit.getScheduler().scheduleSyncRepeatingTask(main, () -> { //TODO double chests sell double?
-            for (Map.Entry<Location, OfflinePlayer> locationEntry : main.getLocations().entrySet()) {
+        sellTimerID = Bukkit.getScheduler().scheduleSyncRepeatingTask(main, () -> {
+            for (Map.Entry<Location, OfflinePlayer> locationEntry : chestLocations.entrySet()) {
                 OfflinePlayer offlineP = locationEntry.getValue();
                 Location loc = locationEntry.getKey();
                 if (loc.getBlock().getType().equals(Material.CHEST)) {
@@ -89,7 +92,7 @@ public class Utils {
                             if (sellPrice > 0) {
                                 main.getHookUtils().giveMoney(offlineP, sellPrice, loc);
                                 voidChestInventory.setItem(voidChestInventory.first(item), new ItemStack(Material.AIR));
-                                loc.getBlock().getState().update(); // TODO probably doesnt make a difference
+                                loc.getBlock().getState().update(); // If you don't update the chest after removing, double chests will sell double
                             }
                         }
                     }
@@ -124,5 +127,27 @@ public class Utils {
         ItemMeta meta = item.getItemMeta();
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         item.setItemMeta(meta);
+    }
+
+    public Map<Location, OfflinePlayer> getChestLocations() {
+        return this.chestLocations;
+    }
+
+    public BlockFace getOppositeDirection(Player player) {
+        double rotation = (player.getLocation().getYaw() - 90) % 360;
+        if (rotation < 0) {
+            rotation += 360.0;
+        }
+        if (rotation >= 45 && rotation < 135) {
+            return BlockFace.SOUTH;
+        } else if (rotation >= 135 && rotation < 225) {
+            return BlockFace.WEST;
+        } else if (rotation >= 225 && rotation < 315) {
+            return BlockFace.NORTH;
+        } else if (rotation >= 315 || rotation < 45) {
+            return BlockFace.EAST;
+        } else {
+            return null;
+        }
     }
 }

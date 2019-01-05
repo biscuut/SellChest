@@ -4,8 +4,10 @@ import codes.biscuit.voidchest.VoidChest;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -16,6 +18,9 @@ import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Chest;
+
+import java.util.Map;
 
 public class PlayerEvents implements Listener {
 
@@ -30,19 +35,29 @@ public class PlayerEvents implements Listener {
         if (!e.isCancelled()) {
             if (e.getPlayer().hasPermission("voidchest.place")) {
                 if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && e.getItem() != null && main.getUtils().isVoidChest(e.getItem())) {
-                    Block newBlock = e.getClickedBlock().getRelative(e.getBlockFace());
+                    e.setCancelled(true);
+                    Block newBlock;
+                    if (e.getClickedBlock().getType().equals(Material.LONG_GRASS)) {
+                        newBlock = e.getClickedBlock(); // Blocks place directly on grass (remind me if i'm missing more blocks)
+                    } else {
+                        newBlock = e.getClickedBlock().getRelative(e.getBlockFace());
+                    }
                     Block[] surroundingBlocks = {newBlock.getRelative(BlockFace.NORTH),
                             newBlock.getRelative(BlockFace.EAST),
                             newBlock.getRelative(BlockFace.SOUTH),
                             newBlock.getRelative(BlockFace.WEST)};
-                    e.setCancelled(true);
                     for (Block currentBlock : surroundingBlocks) {
-                        if (currentBlock.getType().equals(Material.CHEST) && !main.getLocations().containsKey(currentBlock.getLocation())) {
+                        if (currentBlock.getType().equals(Material.CHEST) && !main.getUtils().getChestLocations().containsKey(currentBlock.getLocation())) {
                             if (!main.getConfigUtils().getMessageVoidChestBeside().equals("")) e.getPlayer().sendMessage(main.getConfigUtils().getMessageVoidChestBeside());
                             return;
                         }
                     }
                     newBlock.setType(Material.CHEST);
+                    BlockState state = newBlock.getState();
+                    Chest chest = new Chest(main.getUtils().getOppositeDirection(e.getPlayer()));
+                    state.setData(chest);
+                    state.update();
+                    e.getPlayer().getWorld().playSound(e.getPlayer().getLocation(), Sound.STEP_WOOD, 1, 1);
                     if (e.getPlayer().getGameMode().equals(GameMode.SURVIVAL) || e.getPlayer().getGameMode().equals(GameMode.ADVENTURE)) {
                         ItemStack removeItem = e.getItem();
                         removeItem.setAmount(e.getItem().getAmount() - 1);
@@ -59,13 +74,13 @@ public class PlayerEvents implements Listener {
 
     @EventHandler
     public void onChestPlace(BlockPlaceEvent e) {
-        if (e.getBlock().getType().equals(Material.CHEST)) { // TODO && is not voidchest necessary?
+        if (e.getBlock().getType().equals(Material.CHEST)) { // and is not a voidchest (above is cancelled actually... hmm)
             Block[] surroundingBlocks = {e.getBlock().getRelative(BlockFace.NORTH),
                     e.getBlock().getRelative(BlockFace.EAST),
                     e.getBlock().getRelative(BlockFace.SOUTH),
                     e.getBlock().getRelative(BlockFace.WEST)};
             for (Block currentBlock : surroundingBlocks) {
-                if (currentBlock.getType().equals(Material.CHEST) && main.getLocations().containsKey(currentBlock.getLocation())) {
+                if (currentBlock.getType().equals(Material.CHEST) && main.getUtils().getChestLocations().containsKey(currentBlock.getLocation())) {
                     if (!main.getConfigUtils().getMessageChestBeside().equals("")) e.getPlayer().sendMessage(main.getConfigUtils().getMessageChestBeside());
                     e.setCancelled(true);
                     return;
@@ -75,46 +90,61 @@ public class PlayerEvents implements Listener {
     }
 
     @EventHandler
-    public void onVoidChestDamage(BlockDamageEvent e) {
-        if (e.getBlock().getType().equals(Material.CHEST) && main.getLocations().containsKey(e.getBlock().getLocation())) {
+    public void onVoidChestBreak(BlockBreakEvent e) {
+        Block b = e.getBlock();
+        if (b.getType().equals(Material.CHEST) &&
+                main.getUtils().getChestLocations().containsKey(b.getLocation())) {
             e.setCancelled(true);
-            Player p = e.getPlayer();
-            OfflinePlayer offlineP = main.getLocations().get(e.getBlock().getLocation());
-            if (offlineP.getPlayer().getUniqueId().equals(p.getUniqueId())) {
-                if (p.getInventory().firstEmpty() != -1) {
-                    p.sendMessage(main.getConfigUtils().getMessageRemove());
-                    main.getLocations().remove(e.getBlock().getLocation());
-                    e.getBlock().setType(Material.AIR);
-                    p.getInventory().addItem(main.getUtils().getVoidChestItemStack(1));
-                    main.getUtils().removeConfigLocation(e.getBlock().getLocation(), e.getPlayer());
-                } else {
-                    p.sendMessage(main.getConfigUtils().getMessageNoSpace());
-                }
-            } else {
-                p.sendMessage(main.getConfigUtils().getMessageNotOwner());
-            }
+            breakVoidChest(e.getPlayer(), b);
         }
     }
 
     @EventHandler
-    public void onVoidChestBreak(BlockBreakEvent e) {
-        if (e.getBlock().getType().equals(Material.CHEST) && main.getLocations().containsKey(e.getBlock().getLocation())) {
+    public void onVoidChestDamage(BlockDamageEvent e) {
+        Block b = e.getBlock();
+        if (main.getConfigUtils().sneakToBreak() && b.getType().equals(Material.CHEST) &&
+                main.getUtils().getChestLocations().containsKey(b.getLocation()) && e.getPlayer().isSneaking()) {
             e.setCancelled(true);
-            Player p = e.getPlayer();
-            OfflinePlayer offlineP = main.getLocations().get(e.getBlock().getLocation());
-            if (offlineP.getPlayer().getUniqueId().equals(p.getUniqueId())) {
-                if (p.getInventory().firstEmpty() != -1) {
-                    p.sendMessage(main.getConfigUtils().getMessageRemove());
-                    main.getLocations().remove(e.getBlock().getLocation());
-                    e.getBlock().setType(Material.AIR);
-                    p.getInventory().addItem(main.getUtils().getVoidChestItemStack(1));
-                    main.getUtils().removeConfigLocation(e.getBlock().getLocation(), e.getPlayer());
-                } else {
-                    p.sendMessage(main.getConfigUtils().getMessageNoSpace());
+            breakVoidChest(e.getPlayer(), b);
+        }
+    }
+
+    private void breakVoidChest(Player p, Block b) {
+        OfflinePlayer offlineP = main.getUtils().getChestLocations().get(b.getLocation());
+        if (offlineP.getPlayer().getUniqueId().equals(p.getUniqueId())) {
+            if (main.getConfigUtils().breakIntoInventory()) {
+                if (main.getConfigUtils().breakDontDropIfFull()) {
+                    if (p.getInventory().firstEmpty() == -1) {
+                        if (!main.getConfigUtils().getMessageNoSpace().equals(""))
+                            p.sendMessage(main.getConfigUtils().getMessageNoSpace());
+                        return;
+                    }
+                }
+                main.getUtils().getChestLocations().remove(b.getLocation());
+                b.setType(Material.AIR);
+                main.getUtils().removeConfigLocation(b.getLocation(), p);
+                Map excessItems = p.getInventory().addItem(main.getUtils().getVoidChestItemStack(1));
+                for (Object excessItem : excessItems.values()) {
+                    int itemCount = ((ItemStack) excessItem).getAmount();
+                    while (itemCount > 64) {
+                        ((ItemStack) excessItem).setAmount(64);
+                        p.getWorld().dropItemNaturally(p.getLocation(), (ItemStack) excessItem);
+                        itemCount = itemCount - 64;
+                    }
+                    if (itemCount > 0) {
+                        ((ItemStack) excessItem).setAmount(itemCount);
+                        p.getWorld().dropItemNaturally(p.getLocation(), (ItemStack) excessItem);
+                    }
                 }
             } else {
-                p.sendMessage(main.getConfigUtils().getMessageNotOwner());
+                main.getUtils().getChestLocations().remove(b.getLocation());
+                b.setType(Material.AIR);
+                main.getUtils().removeConfigLocation(b.getLocation(), p);
+                p.getWorld().dropItemNaturally(b.getLocation(), main.getUtils().getVoidChestItemStack(1));
             }
+            if (!main.getConfigUtils().getMessageRemove().equals("")) p.sendMessage(main.getConfigUtils().getMessageRemove());
+        } else {
+            if (!main.getConfigUtils().getMessageNotOwner().equals("")) p.sendMessage(main.getConfigUtils().getMessageNotOwner());
         }
     }
 }

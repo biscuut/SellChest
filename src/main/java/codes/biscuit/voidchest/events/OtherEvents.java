@@ -21,7 +21,7 @@ public class OtherEvents implements Listener {
     @EventHandler
     public void onVoidChestEntityExplosion(EntityExplodeEvent e) {
         for (Block block : new ArrayList<>(e.blockList())) {
-            if (main.getLocations().containsKey(block.getLocation())) {
+            if (main.getUtils().getChestLocations().containsKey(block.getLocation())) {
                 e.blockList().remove(block);
             }
         }
@@ -30,7 +30,7 @@ public class OtherEvents implements Listener {
     @EventHandler
     public void onVoidChestBlockExplosion(BlockExplodeEvent e) {
         for (Block block : new ArrayList<>(e.blockList())) {
-            if (main.getLocations().containsKey(block.getLocation())) {
+            if (main.getUtils().getChestLocations().containsKey(block.getLocation())) {
                 e.blockList().remove(block);
             }
         }
@@ -38,7 +38,7 @@ public class OtherEvents implements Listener {
 
     @EventHandler
     public void onVoidChestBurn(BlockBurnEvent e) {
-        if (main.getLocations().containsKey(e.getBlock().getLocation())) {
+        if (main.getUtils().getChestLocations().containsKey(e.getBlock().getLocation())) {
             e.setCancelled(true);
         }
     }

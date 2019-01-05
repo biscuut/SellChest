@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 public class ConfigUtils {
 
@@ -33,7 +34,7 @@ public class ConfigUtils {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-            Bukkit.getLogger().info("[VoidChest] Files not found, generated configs!");
+            main.getLogger().info("Files not found, generated configs!");
         } else {
             locationsConfig = YamlConfiguration.loadConfiguration(this.locationsFile);
             Set<String> locationKeys = locationsConfig.getConfigurationSection("locations").getKeys(false);
@@ -42,13 +43,13 @@ public class ConfigUtils {
                 OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
                 List<String> locationList = locationsConfig.getStringList("locations." + key);
                 for (String location : locationList) {
-                    String[] splitLocation = location.split("!");
+                    String[] splitLocation = location.split(Pattern.quote("|"));
                     World world = Bukkit.getWorld(splitLocation[0]);
                     Double x = Double.parseDouble(splitLocation[1]);
                     Double y = Double.parseDouble(splitLocation[2]);
                     Double z = Double.parseDouble(splitLocation[3]);
                     Location loc = new Location(world, Location.locToBlock(x), Location.locToBlock(y), Location.locToBlock(z));
-                    main.getLocations().put(loc, p);
+                    main.getUtils().getChestLocations().put(loc, p);
                 }
             }
         }
@@ -210,5 +211,21 @@ public class ConfigUtils {
 
     public double getConfigPrice(String item) {
         return main.getConfig().getDouble("prices."+item);
+    }
+
+    public boolean sneakToBreak() {
+        return main.getConfig().getBoolean("sneak-punch-to-break");
+    }
+
+    public boolean commandDontDropIfFull() {
+        return !main.getConfig().getBoolean("command-drop-if-full");
+    }
+
+    public boolean breakDontDropIfFull() {
+        return !main.getConfig().getBoolean("break-drop-if-full");
+    }
+
+    public boolean breakIntoInventory() {
+        return main.getConfig().getBoolean("break-give-to-inventory");
     }
 }
