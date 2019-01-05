@@ -32,6 +32,14 @@ break-give-to-inventory: true
 # Drop the voidchest on the floor if the player's inventory is full when breaking the voidchest (applies if above is true)
 break-drop-if-full: true
 
+# If set to false, only the respective owners/team members can break this chest.
+# For example, if money-recipient: is set to FACTION_LEADER or FACTION_BALANCE, anyone
+# in the faction can break the chest.
+anyone-can-break: false
+
+# The minimum factions rank that can break voidchests.
+minimum-factions-rank-break: 'MEMBER' #TODO check these 2
+
 # Customize the voidchest item.
 item:
   material: 'CHEST'
@@ -59,6 +67,7 @@ messages:
   voidchest-receive: '&aYou have received {amount} voidchests!'
   no-permission-place: '&cYou do not have permission to place a voidchest!'
   no-permission-command: '&cNo permission!'
+  not-minimum-faction: '&cYou are not the minimum factions role!'
 
 # These prices will be used if none of the hooks above are enabled. # TODO <--
 prices:

@@ -25,9 +25,12 @@ public class ConfigUtils {
     }
 
     public void setupVoidChests() {
-        if (!this.locationsFile.exists()) {
+        if (!locationsFile.exists()) {
             try {
-                this.locationsFile.createNewFile();
+                boolean outcome = locationsFile.createNewFile();
+                if (!outcome) {
+                    throw new IOException("The file already exists. (impossible?)");
+                }
                 locationsConfig = YamlConfiguration.loadConfiguration(this.locationsFile);
                 locationsConfig.createSection("locations");
                 locationsConfig.save(this.locationsFile);
@@ -115,6 +118,9 @@ public class ConfigUtils {
         return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.no-permission-command"));
     }
 
+    public String getNotMinimumFactionMessage() {
+        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.not-minimum-faction"));
+    }
 
     public String getMessageReceive(int giveAmount) {
         String message = ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.voidchest-receive"));
@@ -227,5 +233,13 @@ public class ConfigUtils {
 
     public boolean breakIntoInventory() {
         return main.getConfig().getBoolean("break-give-to-inventory");
+    }
+
+    public boolean anyoneCanBreak() {
+        return main.getConfig().getBoolean("anyone-can-break");
+    }
+
+    public String minimumFactionsRank() {
+        return main.getConfig().getString("minimum-factions-rank-break").toLowerCase();
     }
 }

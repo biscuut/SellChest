@@ -1,12 +1,15 @@
 package codes.biscuit.voidchest.hooks;
 
+import com.massivecraft.factions.Rel;
 import com.massivecraft.factions.entity.BoardColl;
 import com.massivecraft.factions.entity.Faction;
 import com.massivecraft.factions.entity.MConf;
+import com.massivecraft.factions.entity.MPlayer;
 import com.massivecraft.massivecore.money.Money;
 import com.massivecraft.massivecore.ps.PS;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 
 class MassiveCoreHook {
 
@@ -24,25 +27,44 @@ class MassiveCoreHook {
         return MConf.get().econEnabled && Money.enabled();
     }
 
-    void addBalance(Location loc, double amount) { // Am going to try sending to/from null but if doesnt work ya know why
+    @SuppressWarnings("deprecation")
+    void addBalance(Location loc, double amount) { //TODO check this to make sure
         if (isPlayerClaim(loc)) {
             Faction faction = BoardColl.get().getFactionAt(PS.valueOf(loc));
             hookUtils.economy.depositPlayer(Money.accountId(faction), amount);
         }
     }
 
-//    boolean hasFaction(Player p) {
-//        return MPlayer.get(p).hasFaction();
-//    }
+    boolean factionIsSame(Location loc, Player p) {
+        return MPlayer.get(p).getFaction().equals(BoardColl.get().getFactionAt(PS.valueOf(loc)));
+    }
 
     boolean isPlayerClaim(Location loc) {
         Faction faction = BoardColl.get().getFactionAt(PS.valueOf(loc));
         return faction.isNormal() && !faction.getId().equals("safezone") && !faction.getId().equals("warzone");
     }
 
-//    boolean locationIsFactionClaim(Location loc, Player p) {
-//        Faction locFaction = BoardColl.get().getFactionAt(PS.valueOf(loc));
-//        Faction pFaction = MPlayer.get(p).getFaction();
-//        return locFaction.equals(pFaction);
-//    }
+    boolean checkRole(Player p, String role) {
+        Rel playerRole = MPlayer.get(p).getRole();
+        switch (role) {
+            case "leader": case "admin":
+                if (playerRole.equals(Rel.LEADER)) {
+                    return true;
+                }
+                break;
+            case "officer":
+                if (playerRole.equals(Rel.OFFICER) || playerRole.equals(Rel.LEADER)) {
+                    return true;
+                }
+                break;
+            case "member": case "normal":
+                if (playerRole.equals(Rel.MEMBER) || playerRole.equals(Rel.OFFICER) || playerRole.equals(Rel.LEADER)) {
+                    return true;
+                }
+                break;
+            case "recruit": case "any":
+                return true;
+        }
+        return false;
+    }
 }

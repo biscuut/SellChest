@@ -4,7 +4,7 @@ import com.earth2me.essentials.Essentials;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
-public class EssentialsHook {
+class EssentialsHook {
 
     private Essentials essentials;
 

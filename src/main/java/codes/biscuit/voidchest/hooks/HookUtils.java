@@ -96,6 +96,51 @@ public class HookUtils {
         addPlayerMoney(p, amount);
     }
 
+    public boolean isMinimumFaction(Player p) {
+        MoneyRecipient mr = main.getConfigUtils().getMoneyRecipient();
+        FactionsUUIDHook factionsUUIDHook = ((FactionsUUIDHook)enabledHooks.get(Hooks.FACTIONSUUID));
+        MassiveCoreHook massiveCoreHook = ((MassiveCoreHook)enabledHooks.get(Hooks.MASSIVECOREFACTIONS));
+        if (main.getConfigUtils().factionsHookEnabled()) {
+            if (mr.equals(MoneyRecipient.FACTION_BALANCE) || mr.equals(MoneyRecipient.FACTION_LEADER)) {
+                if (factionsUUIDHook != null) {
+                    return factionsUUIDHook.checkRole(p, main.getConfigUtils().minimumFactionsRank());
+                } else if (massiveCoreHook != null) {
+                    return massiveCoreHook.checkRole(p, main.getConfigUtils().minimumFactionsRank());
+                }
+            }
+        }
+        return true;
+    }
+
+    public boolean canBreakChest(Location loc, Player p) {
+        if (main.getConfigUtils().anyoneCanBreak()) {
+            return true;
+        }
+        MoneyRecipient mr = main.getConfigUtils().getMoneyRecipient();
+        FactionsUUIDHook factionsUUIDHook = ((FactionsUUIDHook)enabledHooks.get(Hooks.FACTIONSUUID));
+        MassiveCoreHook massiveCoreHook = ((MassiveCoreHook)enabledHooks.get(Hooks.MASSIVECOREFACTIONS));
+        ASkyblockHook aSkyblockHook = ((ASkyblockHook)enabledHooks.get(Hooks.ASKYBLOCK));
+        PlotSquaredHook plotSquaredHook = ((PlotSquaredHook)enabledHooks.get(Hooks.PLOTSQUARED));
+        if (main.getConfigUtils().factionsHookEnabled()) {
+            if (mr.equals(MoneyRecipient.FACTION_BALANCE) || mr.equals(MoneyRecipient.FACTION_LEADER)) {
+                if (factionsUUIDHook != null) {
+                    return factionsUUIDHook.factionIsSame(loc, p);
+                } else if (massiveCoreHook != null) {
+                    return massiveCoreHook.factionIsSame(loc, p);
+                }
+            }
+        } else if (main.getConfigUtils().askyblockHookEnabled()) {
+            if (mr.equals(MoneyRecipient.ISLAND_OWNER) && aSkyblockHook != null) {
+                return aSkyblockHook.islandIsSame(loc, p);
+            }
+        } else if (main.getConfigUtils().plotSquaredHookEnabled()) {
+            if (mr.equals(MoneyRecipient.PLOT_OWNER) && plotSquaredHook != null) {
+                return plotSquaredHook.plotIsSame(loc, p);
+            }
+        }
+        return main.getUtils().getChestLocations().get(loc).equals(p); //TODO Check uuids if thid doesnt work
+    }
+
     private void addPlayerMoney(OfflinePlayer p, double amount) {
         economy.depositPlayer(p, amount);
     }

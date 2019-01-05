@@ -3,7 +3,6 @@ package codes.biscuit.voidchest.events;
 import codes.biscuit.voidchest.VoidChest;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -110,39 +109,44 @@ public class PlayerEvents implements Listener {
     }
 
     private void breakVoidChest(Player p, Block b) {
-        OfflinePlayer offlineP = main.getUtils().getChestLocations().get(b.getLocation());
-        if (offlineP.getPlayer().getUniqueId().equals(p.getUniqueId())) {
-            if (main.getConfigUtils().breakIntoInventory()) {
-                if (main.getConfigUtils().breakDontDropIfFull()) {
-                    if (p.getInventory().firstEmpty() == -1) {
-                        if (!main.getConfigUtils().getMessageNoSpace().equals(""))
-                            p.sendMessage(main.getConfigUtils().getMessageNoSpace());
-                        return;
+        // OfflinePlayer offlineP = main.getUtils().getChestLocations().get(b.getLocation()); // This is the owner TODO: remove this if works
+        if (main.getHookUtils().canBreakChest(b.getLocation(), p)) {
+            if (main.getHookUtils().isMinimumFaction(p)) {
+                if (main.getConfigUtils().breakIntoInventory()) {
+                    if (main.getConfigUtils().breakDontDropIfFull()) {
+                        if (p.getInventory().firstEmpty() == -1) {
+                            if (!main.getConfigUtils().getMessageNoSpace().equals(""))
+                                p.sendMessage(main.getConfigUtils().getMessageNoSpace());
+                            return;
+                        }
                     }
+                    main.getUtils().getChestLocations().remove(b.getLocation());
+                    b.setType(Material.AIR);
+                    main.getUtils().removeConfigLocation(b.getLocation(), p);
+                    Map excessItems = p.getInventory().addItem(main.getUtils().getVoidChestItemStack(1));
+                    for (Object excessItem : excessItems.values()) {
+                        int itemCount = ((ItemStack) excessItem).getAmount();
+                        while (itemCount > 64) {
+                            ((ItemStack) excessItem).setAmount(64);
+                            p.getWorld().dropItemNaturally(p.getLocation(), (ItemStack) excessItem);
+                            itemCount = itemCount - 64;
+                        }
+                        if (itemCount > 0) {
+                            ((ItemStack) excessItem).setAmount(itemCount);
+                            p.getWorld().dropItemNaturally(p.getLocation(), (ItemStack) excessItem);
+                        }
+                    }
+                } else {
+                    main.getUtils().getChestLocations().remove(b.getLocation());
+                    b.setType(Material.AIR);
+                    main.getUtils().removeConfigLocation(b.getLocation(), p);
+                    p.getWorld().dropItemNaturally(b.getLocation(), main.getUtils().getVoidChestItemStack(1));
                 }
-                main.getUtils().getChestLocations().remove(b.getLocation());
-                b.setType(Material.AIR);
-                main.getUtils().removeConfigLocation(b.getLocation(), p);
-                Map excessItems = p.getInventory().addItem(main.getUtils().getVoidChestItemStack(1));
-                for (Object excessItem : excessItems.values()) {
-                    int itemCount = ((ItemStack) excessItem).getAmount();
-                    while (itemCount > 64) {
-                        ((ItemStack) excessItem).setAmount(64);
-                        p.getWorld().dropItemNaturally(p.getLocation(), (ItemStack) excessItem);
-                        itemCount = itemCount - 64;
-                    }
-                    if (itemCount > 0) {
-                        ((ItemStack) excessItem).setAmount(itemCount);
-                        p.getWorld().dropItemNaturally(p.getLocation(), (ItemStack) excessItem);
-                    }
-                }
+                if (!main.getConfigUtils().getMessageRemove().equals(""))
+                    p.sendMessage(main.getConfigUtils().getMessageRemove());
             } else {
-                main.getUtils().getChestLocations().remove(b.getLocation());
-                b.setType(Material.AIR);
-                main.getUtils().removeConfigLocation(b.getLocation(), p);
-                p.getWorld().dropItemNaturally(b.getLocation(), main.getUtils().getVoidChestItemStack(1));
+                if (!main.getConfigUtils().getNotMinimumFactionMessage().equals("")) p.sendMessage(main.getConfigUtils().getNotMinimumFactionMessage());
             }
-            if (!main.getConfigUtils().getMessageRemove().equals("")) p.sendMessage(main.getConfigUtils().getMessageRemove());
         } else {
             if (!main.getConfigUtils().getMessageNotOwner().equals("")) p.sendMessage(main.getConfigUtils().getMessageNotOwner());
         }
