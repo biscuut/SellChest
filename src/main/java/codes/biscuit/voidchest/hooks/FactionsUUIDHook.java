@@ -30,12 +30,17 @@ class FactionsUUIDHook {
     }
 
     boolean factionIsSame(Location loc, Player p) {
+        if (Board.getInstance().getFactionAt(new FLocation(loc)).isWilderness()) return true;
         return FPlayers.getInstance().getByPlayer(p).getFaction().equals(Board.getInstance().getFactionAt(new FLocation(loc)));
     }
 
     boolean isPlayerClaim(Location loc) {
         Faction fLocFaction = Board.getInstance().getFactionAt(new FLocation(loc));
         return !fLocFaction.isWilderness() && !fLocFaction.isWarZone() && !fLocFaction.isSafeZone();
+    }
+
+    boolean isWilderness(Location loc) {
+        return Board.getInstance().getFactionAt(new FLocation(loc)).isWilderness();
     }
 
     boolean moneyEnabled() {
@@ -60,7 +65,7 @@ class FactionsUUIDHook {
                     return true;
                 }
                 break;
-            case "coleader":
+            case "coleader": case "co-leader":
                 if (playerRole.equals(Role.COLEADER) || playerRole.equals(adminRole)) {
                     return true;
                 }

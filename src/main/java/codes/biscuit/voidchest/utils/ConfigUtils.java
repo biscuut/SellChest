@@ -1,15 +1,14 @@
 package codes.biscuit.voidchest.utils;
 
+import codes.biscuit.voidchest.VoidChest;
 import codes.biscuit.voidchest.hooks.HookUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;
-import codes.biscuit.voidchest.VoidChest;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -40,12 +39,10 @@ public class ConfigUtils {
             main.getLogger().info("Files not found, generated configs!");
         } else {
             locationsConfig = YamlConfiguration.loadConfiguration(this.locationsFile);
-            Set<String> locationKeys = locationsConfig.getConfigurationSection("locations").getKeys(false);
-            for (String key : locationKeys) {
+            for (String key : locationsConfig.getConfigurationSection("locations").getKeys(false)) {
                 UUID uuid = UUID.fromString(key);
                 OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
-                List<String> locationList = locationsConfig.getStringList("locations." + key);
-                for (String location : locationList) {
+                for (String location : locationsConfig.getStringList("locations." + key)) {
                     String[] splitLocation = location.split(Pattern.quote("|"));
                     World world = Bukkit.getWorld(splitLocation[0]);
                     Double x = Double.parseDouble(splitLocation[1]);

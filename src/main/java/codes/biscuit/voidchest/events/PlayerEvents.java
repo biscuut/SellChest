@@ -16,6 +16,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Chest;
 
@@ -36,10 +37,15 @@ public class PlayerEvents implements Listener {
                 if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && e.getItem() != null && main.getUtils().isVoidChest(e.getItem())) {
                     e.setCancelled(true);
                     Block newBlock;
-                    if (e.getClickedBlock().getType().equals(Material.LONG_GRASS)) {
-                        newBlock = e.getClickedBlock(); // Blocks place directly on grass (remind me if i'm missing more blocks)
+                    if (e.getClickedBlock().getState() instanceof InventoryHolder && !e.getPlayer().isSneaking()) {
+                        return;
+                    } else if (e.getClickedBlock().getType().equals(Material.LONG_GRASS)) {
+                        newBlock = e.getClickedBlock(); // Blocks place directly on grass
                     } else {
                         newBlock = e.getClickedBlock().getRelative(e.getBlockFace());
+                        if (!newBlock.getType().equals(Material.AIR)) { // For hackers
+                            return;
+                        }
                     }
                     Block[] surroundingBlocks = {newBlock.getRelative(BlockFace.NORTH),
                             newBlock.getRelative(BlockFace.EAST),
@@ -56,7 +62,15 @@ public class PlayerEvents implements Listener {
                     Chest chest = new Chest(main.getUtils().getOppositeDirection(e.getPlayer()));
                     state.setData(chest);
                     state.update();
-                    e.getPlayer().getWorld().playSound(e.getPlayer().getLocation(), Sound.STEP_WOOD, 1, 1);
+                    Sound digSound = null;
+                    try {
+                        digSound = Sound.valueOf("DIG_WOOD"); // Sound for 1.8
+                    } catch (Exception ex) {
+                        try {
+                            digSound = Sound.valueOf("BLOCK_WOOD_PLACE"); // 1.9+
+                        } catch (Exception ignored) {}
+                    }
+                    if (digSound != null) e.getPlayer().getWorld().playSound(e.getPlayer().getLocation(), digSound, 1, 0.8F); // Pitch is by ear
                     if (e.getPlayer().getGameMode().equals(GameMode.SURVIVAL) || e.getPlayer().getGameMode().equals(GameMode.ADVENTURE)) {
                         ItemStack removeItem = e.getItem();
                         removeItem.setAmount(e.getItem().getAmount() - 1);
@@ -73,7 +87,7 @@ public class PlayerEvents implements Listener {
 
     @EventHandler
     public void onChestPlace(BlockPlaceEvent e) {
-        if (e.getBlock().getType().equals(Material.CHEST)) { // and is not a voidchest (above is cancelled actually... hmm)
+        if (e.getBlock().getType().equals(Material.CHEST)) {
             Block[] surroundingBlocks = {e.getBlock().getRelative(BlockFace.NORTH),
                     e.getBlock().getRelative(BlockFace.EAST),
                     e.getBlock().getRelative(BlockFace.SOUTH),
@@ -109,9 +123,8 @@ public class PlayerEvents implements Listener {
     }
 
     private void breakVoidChest(Player p, Block b) {
-        // OfflinePlayer offlineP = main.getUtils().getChestLocations().get(b.getLocation()); // This is the owner TODO: remove this if works
         if (main.getHookUtils().canBreakChest(b.getLocation(), p)) {
-            if (main.getHookUtils().isMinimumFaction(p)) {
+            if (main.getHookUtils().isMinimumFaction(p, b.getLocation())) {
                 if (main.getConfigUtils().breakIntoInventory()) {
                     if (main.getConfigUtils().breakDontDropIfFull()) {
                         if (p.getInventory().firstEmpty() == -1) {

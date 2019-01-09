@@ -37,7 +37,7 @@ public class VoidChestCommand implements TabExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender.hasPermission("voidchest.admin")) {
             if (args.length > 0) {
-                switch (args[0]) {
+                switch (args[0].toLowerCase()) {
                     case "give":
                         if (args.length > 1) {
                             Player p = Bukkit.getPlayerExact(args[1]);
@@ -48,7 +48,7 @@ public class VoidChestCommand implements TabExecutor {
                                         try {
                                             giveAmount = Integer.parseInt(args[2]);
                                         } catch (NumberFormatException ex) {
-                                            sender.sendMessage(ChatColor.RED + "This isn't a valid amount! /vc [give] [player] [amount]");
+                                            sender.sendMessage(ChatColor.RED + "This isn't a valid amount (integer)!");
                                             return false;
                                         }
                                     }
@@ -79,13 +79,13 @@ public class VoidChestCommand implements TabExecutor {
                                     sender.sendMessage(ChatColor.GREEN + "Gave " + p.getName() + " " + giveAmount + " voidchest(s)!");
                                     if (!main.getConfigUtils().getMessageReceive(giveAmount).equals("")) p.sendMessage(main.getConfigUtils().getMessageReceive(giveAmount));
                                 } else {
-                                    sender.sendMessage(ChatColor.RED + "This player doesn't have an empty slot!");
+                                    sender.sendMessage(ChatColor.RED + "This player doesn't have an empty slot in their inventory!");
                                 }
                             } else {
                                 sender.sendMessage(ChatColor.RED + "This player isn't online!");
                             }
                         } else {
-                            sender.sendMessage(ChatColor.RED + "You must specify a player! /vc [give] [player] [amount]");
+                            sender.sendMessage(ChatColor.RED + "Please specify a player!");
                         }
                         break;
                     case "reload":
@@ -97,10 +97,10 @@ public class VoidChestCommand implements TabExecutor {
                         sender.sendMessage(ChatColor.GREEN + "Reloaded the config! Most values have been instantly updated.");
                         break;
                     default:
-                        sender.sendMessage(ChatColor.RED + "Invalid argument! /vc [give|reload]");
+                        sender.sendMessage(ChatColor.RED + "Invalid argument!");
                         break;
                 }
-            } else {
+            } else { //TODO bypass
                 sender.sendMessage(ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "--------------" + ChatColor.GRAY +"[" + ChatColor.GOLD + ChatColor.BOLD + " VoidChest " + ChatColor.GRAY + "]" + ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "--------------");
                 sender.sendMessage(ChatColor.GOLD + "● /vc give <player> [amount] " + ChatColor.GRAY + "- Give a player a voidchest");
                 sender.sendMessage(ChatColor.GOLD + "● /vc reload " + ChatColor.GRAY + "- Reload the config");

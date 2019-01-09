@@ -25,7 +25,7 @@ public class HookUtils {
                 pm.getPlugin("Factions") != null) {
             main.getLogger().info("Hooked into MassiveCore factions");
             enabledHooks.put(Hooks.MASSIVECOREFACTIONS, new MassiveCoreHook(this));
-        } else if ( pm.getPlugin("Factions") != null) {
+        } else if (pm.getPlugin("Factions") != null) {
             main.getLogger().info("Hooked into FactionsUUID/SavageFactions");
             enabledHooks.put(Hooks.FACTIONSUUID, new FactionsUUIDHook(this));
         }
@@ -96,15 +96,17 @@ public class HookUtils {
         addPlayerMoney(p, amount);
     }
 
-    public boolean isMinimumFaction(Player p) {
+    public boolean isMinimumFaction(Player p, Location loc) {
         MoneyRecipient mr = main.getConfigUtils().getMoneyRecipient();
         FactionsUUIDHook factionsUUIDHook = ((FactionsUUIDHook)enabledHooks.get(Hooks.FACTIONSUUID));
         MassiveCoreHook massiveCoreHook = ((MassiveCoreHook)enabledHooks.get(Hooks.MASSIVECOREFACTIONS));
         if (main.getConfigUtils().factionsHookEnabled()) {
             if (mr.equals(MoneyRecipient.FACTION_BALANCE) || mr.equals(MoneyRecipient.FACTION_LEADER)) {
                 if (factionsUUIDHook != null) {
+                    if (factionsUUIDHook.isWilderness(loc)) return true;
                     return factionsUUIDHook.checkRole(p, main.getConfigUtils().minimumFactionsRank());
                 } else if (massiveCoreHook != null) {
+                    if (massiveCoreHook.isWilderness(loc)) return true;
                     return massiveCoreHook.checkRole(p, main.getConfigUtils().minimumFactionsRank());
                 }
             }

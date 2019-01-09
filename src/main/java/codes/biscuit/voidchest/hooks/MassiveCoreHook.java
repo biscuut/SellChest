@@ -36,12 +36,17 @@ class MassiveCoreHook {
     }
 
     boolean factionIsSame(Location loc, Player p) {
+        if (BoardColl.get().getFactionAt(PS.valueOf(loc)).isNone()) return true;
         return MPlayer.get(p).getFaction().equals(BoardColl.get().getFactionAt(PS.valueOf(loc)));
     }
 
     boolean isPlayerClaim(Location loc) {
         Faction faction = BoardColl.get().getFactionAt(PS.valueOf(loc));
         return faction.isNormal() && !faction.getId().equals("safezone") && !faction.getId().equals("warzone");
+    }
+
+    boolean isWilderness(Location loc) {
+        return BoardColl.get().getFactionAt(PS.valueOf(loc)).isNone();
     }
 
     boolean checkRole(Player p, String role) {
