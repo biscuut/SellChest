@@ -1,4 +1,4 @@
-package codes.biscuit.voidchest.hooks;
+package codes.biscuit.sellchest.hooks;
 
 import net.brcdev.shopgui.ShopGuiPlusApi;
 import org.bukkit.entity.Player;

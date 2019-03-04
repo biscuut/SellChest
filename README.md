@@ -1,5 +1,5 @@
-# VoidChest
+# SellChest
 
-An customizable minecraft plugin for selling items placed in special "voidchests".
+An customizable minecraft plugin for selling items placed in special "sellchests".
 
-For a full description, visit [the spigot page](https://github.com/biscuut/VoidChest).
+For a full description, visit [the spigot page](linkhere).

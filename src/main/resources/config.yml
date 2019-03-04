@@ -1,37 +1,37 @@
-###################################################
-#  _    __      _     __________              __  #
-# | |  / /___  (_)___/ / ____/ /_  ___  _____/ /_ #
-# | | / / __ \/ / __  / /   / __ \/ _ \/ ___/ __/ #
-# | |/ / /_/ / / /_/ / /___/ / / /  __(__  ) /_   #
-# |___/\____/_/\__,_/\____/_/ /_/\___/____/\__/   #
-#                                                 #
-#                v1.0 by Biscut                   #
-###################################################
+###############################################
+#    _____      ____________              __  #
+#   / ___/___  / / / ____/ /_  ___  _____/ /_ #
+#   \__ \/ _ \/ / / /   / __ \/ _ \/ ___/ __/ #
+#  ___/ /  __/ / / /___/ / / /  __(__  ) /_   #
+# /____/\___/_/_/\____/_/ /_/\___/____/\__/   #
+#                                             #
+#               v${version} by Biscut                #
+###############################################
 
-# How often voidchests should sell their contents, in seconds.
+# How often sellchests should sell their contents, in seconds.
 sell-time: 1.0
 
-# How often voidchest locations should save to config, in seconds (good for when crashes happen).
+# How often sellchest locations should save to config, in seconds (good for when crashes happen).
 save-time: 300.0
 
 # Set to false if you don't want unsellable items to be cleared.
-# ex. if this is true and bedrock is found in a voidchest with a value of $0,
+# ex. if this is true and bedrock is found in a sellchest with a value of $0,
 # it will still be removed from the chest.
 remove-unsellable-items: true
 
 # Options: PLAYER, FACTION_LEADER, FACTION_BALANCE, ISLAND_OWNER, PLOT_OWNER;
 money-recipient: 'PLAYER'
 
-# Shift and punch the voidchest to easily break & return a voidchest (recommended)
+# Shift and punch the sellchest to easily break & return a sellchest (recommended)
 sneak-punch-to-break: true
 
-# Drop the voidchest on the floor if the player's inventory is full when doing /vc give
+# Drop the sellchest on the floor if the player's inventory is full when doing /vc give
 command-drop-if-full: true
 
-# Whether to put the voidchest directly in the player's inventory when breaking it
+# Whether to put the sellchest directly in the player's inventory when breaking it
 break-give-to-inventory: true
 
-# Drop the voidchest on the floor if the player's inventory is full when breaking the voidchest (applies if above is true)
+# Drop the sellchest on the floor if the player's inventory is full when breaking the sellchest (applies if above is true)
 break-drop-if-full: true
 
 # If set to false, only the respective owners/team members can break this chest.
@@ -39,13 +39,13 @@ break-drop-if-full: true
 # in the faction can break the chest.
 anyone-can-break: false
 
-# The minimum factions rank that can break voidchests, only works if factions hook is enabled.
+# The minimum factions rank that can break sellchests, only works if factions hook is enabled.
 minimum-factions-rank-break: 'MEMBER'
 
-# Customize the voidchest item.
+# Customize the sellchest item.
 item:
   material: 'CHEST' # Note, the physical block will always be a chest regardless of this material.
-  name: '&6&lVoidChest'
+  name: '&6&lSellChest'
   lore:
     - '&7Anything placed in this chest will be automatically sold'
     - '&7according to the shop price and straight into your balance.'
@@ -66,14 +66,14 @@ shopguiplus-workaround: false
 
 # Customize messages from the plugin.
 messages:
-  voidchest-beside-chest: '&cYou cannot place a voidchest beside another chest!'
-  chest-beside-voidchest: '&cYou cannot place a chest beside a voidchest!'
-  voidchest-removed: '&aVoidchest removed and added to your inventory!'
-  voidchest-remove-nospace: '&cYou must have an empty inventory slot to break this voidchest!'
-  voidchest-remove-notowner: '&cYou cannot destroy a voidchest that is not yours!'
-  voidchest-place: '&aVoidchest placed!'
-  voidchest-receive: '&aYou have received {amount} voidchests!'
-  no-permission-place: '&cYou do not have permission to place a voidchest!'
+  sellchest-beside-chest: '&cYou cannot place a sellchest beside another chest!'
+  chest-beside-sellchest: '&cYou cannot place a chest beside a sellchest!'
+  sellchest-removed: '&aSellchest removed and added to your inventory!'
+  sellchest-remove-nospace: '&cYou must have an empty inventory slot to break this sellchest!'
+  sellchest-remove-notowner: '&cYou cannot destroy a sellchest that is not yours!'
+  sellchest-place: '&aSellchest placed!'
+  sellchest-receive: '&aYou have received {amount} sellchests!'
+  no-permission-place: '&cYou do not have permission to place a sellchest!'
   no-permission-command: '&cNo permission!'
   not-minimum-faction: '&cYou are not the minimum factions role!'
 

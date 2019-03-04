@@ -1,6 +1,6 @@
-package codes.biscuit.voidchest.utils;
+package codes.biscuit.sellchest.utils;
 
-import codes.biscuit.voidchest.VoidChest;
+import codes.biscuit.sellchest.SellChest;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -24,13 +24,13 @@ import java.util.regex.Pattern;
 
 public class Utils {
 
-    private VoidChest main;
+    private SellChest main;
     private int sellTimerID;
     private int saveTimerID;
     private Map<Location, OfflinePlayer> chestLocations = new HashMap<>();
     private Set<OfflinePlayer> bypassPlayers = new HashSet<>();
 
-    public Utils(VoidChest main) {
+    public Utils(SellChest main) {
         this.main = main;
     }
 
@@ -42,14 +42,14 @@ public class Utils {
         return (item.hasItemMeta() && item.getItemMeta().getDisplayName().equals(main.getConfigValues().getChestName()) && item.getItemMeta().hasLore() && item.getItemMeta().getLore().equals(main.getConfigValues().getChestLore()));
     }
 
-    public ItemStack getVoidChestItemStack(int amount) {
-        ItemStack voidChest = new ItemStack(main.getConfigValues().getItemMaterial(), amount, main.getConfigValues().getItemDamage());
-        ItemMeta voidChestMeta = voidChest.getItemMeta();
-        voidChestMeta.setDisplayName(main.getConfigValues().getChestName());
-        voidChestMeta.setLore(main.getConfigValues().getChestLore());
-        voidChest.setItemMeta(voidChestMeta);
-        if (main.getConfigValues().chestShouldGlow()) addGlow(voidChest);
-        return voidChest;
+    public ItemStack getSellChestItemStack(int amount) {
+        ItemStack sellChest = new ItemStack(main.getConfigValues().getItemMaterial(), amount, main.getConfigValues().getItemDamage());
+        ItemMeta sellChestMeta = sellChest.getItemMeta();
+        sellChestMeta.setDisplayName(main.getConfigValues().getChestName());
+        sellChestMeta.setLore(main.getConfigValues().getChestLore());
+        sellChest.setItemMeta(sellChestMeta);
+        if (main.getConfigValues().chestShouldGlow()) addGlow(sellChest);
+        return sellChest;
     }
 
     public void addConfigLocation(Location loc, OfflinePlayer offlineP) {
@@ -162,7 +162,7 @@ public class Utils {
         return bypassPlayers;
     }
 
-    public void updateConfig(VoidChest main) { //TODO: Unused for the first version.
+    public void updateConfig(SellChest main) { //TODO: Unused for the first version.
         if (main.getConfigValues().getConfigVersion() < 1.0) {
             Map<String, Object> oldValues = new HashMap<>();
             for (String oldKey : main.getConfig().getKeys(true)) {
@@ -185,7 +185,7 @@ public class Utils {
             URL url = new URL("https://api.spigotmc.org/legacy/update.php?resource=(ID HERE)");
             URLConnection connection = url.openConnection();
             connection.setReadTimeout(5000);
-            connection.addRequestProperty("User-Agent", "VoidChest update checker");
+            connection.addRequestProperty("User-Agent", "SellChest update checker");
             connection.setDoOutput(true);
             final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String newestVersion = reader.readLine();
@@ -205,13 +205,13 @@ public class Utils {
             for (int i = 0; i < 3; i++) {
                 if (newestVersionNumbers.get(i) != null && thisVersionNumbers.get(i) != null) {
                     if (newestVersionNumbers.get(i) > thisVersionNumbers.get(i)) {
-                        TextComponent newVersion = new TextComponent("A new version of VoidChest, " + newestVersion + " is available. Download it by clicking here.");
+                        TextComponent newVersion = new TextComponent("A new version of SellChest, " + newestVersion + " is available. Download it by clicking here.");
                         newVersion.setColor(ChatColor.RED);
                         newVersion.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "(ADD LINK)"));
                         p.spigot().sendMessage(newVersion);
                         break;
                     } else if (thisVersionNumbers.get(i) > newestVersionNumbers.get(i)) {
-                        p.sendMessage(ChatColor.RED + "You are running a development version of VoidChest, " + main.getDescription().getVersion() + ". The latest online version is " + newestVersion + ".");
+                        p.sendMessage(ChatColor.RED + "You are running a development version of SellChest, " + main.getDescription().getVersion() + ". The latest online version is " + newestVersion + ".");
                         break;
                     }
                 }

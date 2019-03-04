@@ -1,4 +1,4 @@
-package codes.biscuit.voidchest.hooks;
+package codes.biscuit.sellchest.hooks;
 
 import com.massivecraft.factions.Rel;
 import com.massivecraft.factions.entity.BoardColl;

@@ -1,4 +1,4 @@
-package codes.biscuit.voidchest.hooks;
+package codes.biscuit.sellchest.hooks;
 
 import com.earth2me.essentials.Essentials;
 import org.bukkit.inventory.ItemStack;

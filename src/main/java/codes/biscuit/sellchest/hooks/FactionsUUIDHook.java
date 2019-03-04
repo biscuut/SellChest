@@ -1,4 +1,4 @@
-package codes.biscuit.voidchest.hooks;
+package codes.biscuit.sellchest.hooks;
 
 import com.massivecraft.factions.Board;
 import com.massivecraft.factions.FLocation;

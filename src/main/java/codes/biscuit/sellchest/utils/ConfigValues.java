@@ -1,7 +1,7 @@
-package codes.biscuit.voidchest.utils;
+package codes.biscuit.sellchest.utils;
 
-import codes.biscuit.voidchest.VoidChest;
-import codes.biscuit.voidchest.hooks.HookUtils;
+import codes.biscuit.sellchest.SellChest;
+import codes.biscuit.sellchest.hooks.HookUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -14,16 +14,16 @@ import java.util.regex.Pattern;
 
 public class ConfigValues {
 
-    private VoidChest main;
+    private SellChest main;
     private File locationsFile;
     private YamlConfiguration locationsConfig;
 
-    public ConfigValues(VoidChest main) {
-        locationsFile = new File("plugins/VoidChest/locations.yml");
+    public ConfigValues(SellChest main) {
+        locationsFile = new File("plugins/SellChest/locations.yml");
         this.main = main;
     }
 
-    public void setupVoidChests() {
+    public void setupSellChests() {
         if (!locationsFile.exists()) {
             try {
                 boolean outcome = locationsFile.createNewFile();
@@ -83,28 +83,28 @@ public class ConfigValues {
         return main.getConfig().getBoolean("remove-unsellable-items");
     }
 
-    public String getMessageVoidChestBeside() {
-        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.voidchest-beside-chest"));
+    public String getMessageSellChestBeside() {
+        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.sellchest-beside-chest"));
     }
 
     public String getMessageChestBeside() {
-        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.chest-beside-voidchest"));
+        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.chest-beside-sellchest"));
     }
 
     public String getMessageRemove() {
-        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.voidchest-removed"));
+        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.sellchest-removed"));
     }
 
     public String getMessageNoSpace() {
-        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.voidchest-remove-nospace"));
+        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.sellchest-remove-nospace"));
     }
 
     public String getMessageNotOwner() {
-        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.voidchest-remove-notowner"));
+        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.sellchest-remove-notowner"));
     }
 
     public String getMessagePlace() {
-        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.voidchest-place"));
+        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.sellchest-place"));
     }
 
     public String getNoPermissionPlaceMessage() {
@@ -120,7 +120,7 @@ public class ConfigValues {
     }
 
     public String getMessageReceive(int giveAmount) {
-        String message = ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.voidchest-receive"));
+        String message = ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.sellchest-receive"));
         return message.replace("{amount}", String.valueOf(giveAmount));
     }
 

@@ -1,19 +1,19 @@
-name: VoidChest
+name: SellChest
 version: 1.0
 api-version: 1.13
-main: codes.biscuit.voidchest.VoidChest
+main: codes.biscuit.sellchest.SellChest
 author: Biscut
-description: Automatically sells all items that enter a voidchest.
+description: Automatically sells all items that enter a sellchest.
 depend: [Vault]
 softdepend: [ShopGUIPlus, PlotSquared, Factions, MassiveCore, Essentials, ASkyBlock]
 commands:
-  voidchest:
-    description: The main voidchest command.
-    aliases: [vc]
+  sellchest:
+    description: The main sellchest command.
+    aliases: [sc]
 permissions:
-  voidchest.admin:
-    description: Access to the main voidchest command.
+  sellchest.admin:
+    description: Access to the main sellchest command.
     default: op
-  voidchest.place:
-    description: Ability to place voidchests.
+  sellchest.place:
+    description: Ability to place sellchest.
     default: true

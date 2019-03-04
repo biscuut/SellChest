@@ -1,6 +1,6 @@
-package codes.biscuit.voidchest.hooks;
+package codes.biscuit.sellchest.hooks;
 
-import codes.biscuit.voidchest.VoidChest;
+import codes.biscuit.sellchest.SellChest;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -13,11 +13,11 @@ import java.util.Map;
 
 public class HookUtils {
 
-    private VoidChest main;
+    private SellChest main;
     private Economy economy;
     private Map<Hooks, Object> enabledHooks = new HashMap<>();
 
-    public HookUtils(VoidChest main) {
+    public HookUtils(SellChest main) {
         this.main = main;
         economy = main.getServer().getServicesManager().getRegistration(Economy.class).getProvider();
         PluginManager pm = main.getServer().getPluginManager();

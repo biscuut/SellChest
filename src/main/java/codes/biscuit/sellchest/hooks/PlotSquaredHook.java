@@ -1,4 +1,4 @@
-package codes.biscuit.voidchest.hooks;
+package codes.biscuit.sellchest.hooks;
 
 import com.intellectualcrafters.plot.api.PlotAPI;
 import org.bukkit.Bukkit;

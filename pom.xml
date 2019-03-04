@@ -5,14 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>codes.biscuit</groupId>
-    <artifactId>VoidChest</artifactId>
+    <artifactId>SellChest</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
 
-    <name>VoidChest</name>
+    <name>SellChest</name>
 
     <description>Automatically sells all chest contents.</description>
-    <url>https://www.spigotmc.org/resources//</url>
+    <url>https://www.spigotmc.org/resources/</url>
 
     <build>
         <plugins>

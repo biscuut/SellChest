@@ -1,6 +1,6 @@
-package codes.biscuit.voidchest.events;
+package codes.biscuit.sellchest.events;
 
-import codes.biscuit.voidchest.VoidChest;
+import codes.biscuit.sellchest.SellChest;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -24,9 +24,9 @@ import java.util.Map;
 
 public class PlayerEvents implements Listener {
 
-    private VoidChest main;
+    private SellChest main;
 
-    public PlayerEvents(VoidChest main) {
+    public PlayerEvents(SellChest main) {
         this.main = main;
     }
 
@@ -34,7 +34,7 @@ public class PlayerEvents implements Listener {
     public void onVoidChestPlace(PlayerInteractEvent e) {
         boolean bypassing = main.getUtils().getBypassPlayers().contains(e.getPlayer());
         if (!e.isCancelled() || bypassing) {
-            if (e.getPlayer().hasPermission("voidchest.place") || bypassing) {
+            if (e.getPlayer().hasPermission("sellchest.place") || bypassing) {
                 if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && e.getItem() != null && main.getUtils().isVoidChest(e.getItem())) {
                     e.setCancelled(true);
                     Block newBlock;
@@ -63,8 +63,8 @@ public class PlayerEvents implements Listener {
                             newBlock.getRelative(BlockFace.WEST)};
                     for (Block currentBlock : surroundingBlocks) {
                         if (currentBlock.getType().equals(Material.CHEST) && !main.getUtils().getChestLocations().containsKey(currentBlock.getLocation())) {
-                            if (!main.getConfigValues().getMessageVoidChestBeside().equals(""))
-                                e.getPlayer().sendMessage(main.getConfigValues().getMessageVoidChestBeside());
+                            if (!main.getConfigValues().getMessageSellChestBeside().equals(""))
+                                e.getPlayer().sendMessage(main.getConfigValues().getMessageSellChestBeside());
                             return;
                         }
                     }
@@ -158,7 +158,7 @@ public class PlayerEvents implements Listener {
                     main.getUtils().getChestLocations().remove(b.getLocation());
                     b.setType(Material.AIR);
                     main.getUtils().removeConfigLocation(b.getLocation(), p);
-                    Map excessItems = p.getInventory().addItem(main.getUtils().getVoidChestItemStack(1));
+                    Map excessItems = p.getInventory().addItem(main.getUtils().getSellChestItemStack(1));
                     for (Object excessItem : excessItems.values()) {
                         int itemCount = ((ItemStack) excessItem).getAmount();
                         while (itemCount > 64) {
@@ -175,7 +175,7 @@ public class PlayerEvents implements Listener {
                     main.getUtils().getChestLocations().remove(b.getLocation());
                     b.setType(Material.AIR);
                     main.getUtils().removeConfigLocation(b.getLocation(), p);
-                    p.getWorld().dropItemNaturally(b.getLocation(), main.getUtils().getVoidChestItemStack(1));
+                    p.getWorld().dropItemNaturally(b.getLocation(), main.getUtils().getSellChestItemStack(1));
                 }
                 if (!main.getConfigValues().getMessageRemove().equals(""))
                     p.sendMessage(main.getConfigValues().getMessageRemove());

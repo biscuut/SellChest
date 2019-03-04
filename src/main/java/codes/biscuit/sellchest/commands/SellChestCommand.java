@@ -1,7 +1,7 @@
-package codes.biscuit.voidchest.commands;
+package codes.biscuit.sellchest.commands;
 
-import codes.biscuit.voidchest.VoidChest;
-import codes.biscuit.voidchest.utils.Utils;
+import codes.biscuit.sellchest.SellChest;
+import codes.biscuit.sellchest.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -11,11 +11,11 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-public class VoidChestCommand implements TabExecutor {
+public class SellChestCommand implements TabExecutor {
 
-    private VoidChest main;
+    private SellChest main;
 
-    public VoidChestCommand(VoidChest main) {
+    public SellChestCommand(SellChest main) {
         this.main = main;
     }
 
@@ -35,7 +35,7 @@ public class VoidChestCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender.hasPermission("voidchest.admin")) {
+        if (sender.hasPermission("sellchest.admin")) {
             if (args.length > 0) {
                 switch (args[0].toLowerCase()) {
                     case "give":
@@ -59,11 +59,11 @@ public class VoidChestCommand implements TabExecutor {
                                                 return true;
                                             }
                                         } else {
-                                            sender.sendMessage(Utils.color("&cYou can only give 64 voidchests at a time!"));
+                                            sender.sendMessage(Utils.color("&cYou can only give 64 sellchests at a time!"));
                                             return true;
                                         }
                                     }
-                                    Map excessItems = p.getInventory().addItem(main.getUtils().getVoidChestItemStack(giveAmount));
+                                    Map excessItems = p.getInventory().addItem(main.getUtils().getSellChestItemStack(giveAmount));
                                     for (Object excessItem : excessItems.values()) {
                                         int itemCount = ((ItemStack) excessItem).getAmount();
                                         while (itemCount > 64) {
@@ -76,7 +76,7 @@ public class VoidChestCommand implements TabExecutor {
                                             p.getWorld().dropItemNaturally(p.getLocation(), (ItemStack) excessItem);
                                         }
                                     }
-                                    sender.sendMessage(Utils.color("&aGave " + p.getName() + " " + giveAmount + " voidchest(s)!"));
+                                    sender.sendMessage(Utils.color("&aGave " + p.getName() + " " + giveAmount + " sellchest(s)!"));
                                     if (!main.getConfigValues().getMessageReceive(giveAmount).equals("")) p.sendMessage(main.getConfigValues().getMessageReceive(giveAmount));
                                 } else {
                                     sender.sendMessage(Utils.color("&cThis player doesn't have an empty slot in their inventory!"));
@@ -115,10 +115,10 @@ public class VoidChestCommand implements TabExecutor {
                         break;
                 }
             } else {
-                sender.sendMessage(Utils.color("&7&m--------------&7[&6&b VoidChest &7]&7&m--------------"));
-                sender.sendMessage(Utils.color("&6● /vc give <player> [amount]  &7- Give a player a voidchest"));
-                sender.sendMessage(Utils.color("&6● /vc bypass &7- Bypass all restrictions for placing/breaking voidchests"));
-                sender.sendMessage(Utils.color("&6● /vc reload &7- Reload the config"));
+                sender.sendMessage(Utils.color("&7&m--------------&7[&6&l SellChest &7]&7&m--------------"));
+                sender.sendMessage(Utils.color("&6● /sc give <player> [amount]  &7- Give a player a sellchest"));
+                sender.sendMessage(Utils.color("&6● /sc bypass &7- Bypass all restrictions for placing/breaking sellchests"));
+                sender.sendMessage(Utils.color("&6● /sc reload &7- Reload the config"));
                 sender.sendMessage(Utils.color("&7&ov" + main.getDescription().getVersion() + " by Biscut"));
                 sender.sendMessage(Utils.color("&7&m-----------------------------------------"));
             }

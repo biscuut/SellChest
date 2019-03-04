@@ -1,6 +1,6 @@
-package codes.biscuit.voidchest.events;
+package codes.biscuit.sellchest.events;
 
-import codes.biscuit.voidchest.VoidChest;
+import codes.biscuit.sellchest.SellChest;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,9 +12,9 @@ import java.util.ArrayList;
 
 public class OtherEvents implements Listener {
 
-    private VoidChest main;
+    private SellChest main;
 
-    public OtherEvents(VoidChest main) {
+    public OtherEvents(SellChest main) {
         this.main = main;
     }
 
