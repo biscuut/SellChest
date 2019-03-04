@@ -1,7 +1,7 @@
 package codes.biscuit.voidchest.commands;
 
 import codes.biscuit.voidchest.VoidChest;
-import net.md_5.bungee.api.ChatColor;
+import codes.biscuit.voidchest.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -48,18 +48,18 @@ public class VoidChestCommand implements TabExecutor {
                                         try {
                                             giveAmount = Integer.parseInt(args[2]);
                                         } catch (NumberFormatException ex) {
-                                            sender.sendMessage(ChatColor.RED + "This isn't a valid amount (integer)!");
+                                            sender.sendMessage(Utils.color("&cThis isn't a valid amount (integer)!"));
                                             return false;
                                         }
                                     }
-                                    if (main.getConfigUtils().commandDontDropIfFull()) {
+                                    if (main.getConfigValues().commandDontDropIfFull()) {
                                         if (giveAmount < 65) {
                                             if (p.getInventory().firstEmpty() == -1) {
-                                                sender.sendMessage(ChatColor.RED + "This player doesn't have any empty slots in their inventory!");
+                                                sender.sendMessage(Utils.color("&cThis player doesn't have any empty slots in their inventory!"));
                                                 return true;
                                             }
                                         } else {
-                                            sender.sendMessage(ChatColor.RED + "You can only give 64 voidchests at a time!");
+                                            sender.sendMessage(Utils.color("&cYou can only give 64 voidchests at a time!"));
                                             return true;
                                         }
                                     }
@@ -76,16 +76,16 @@ public class VoidChestCommand implements TabExecutor {
                                             p.getWorld().dropItemNaturally(p.getLocation(), (ItemStack) excessItem);
                                         }
                                     }
-                                    sender.sendMessage(ChatColor.GREEN + "Gave " + p.getName() + " " + giveAmount + " voidchest(s)!");
-                                    if (!main.getConfigUtils().getMessageReceive(giveAmount).equals("")) p.sendMessage(main.getConfigUtils().getMessageReceive(giveAmount));
+                                    sender.sendMessage(Utils.color("&aGave " + p.getName() + " " + giveAmount + " voidchest(s)!"));
+                                    if (!main.getConfigValues().getMessageReceive(giveAmount).equals("")) p.sendMessage(main.getConfigValues().getMessageReceive(giveAmount));
                                 } else {
-                                    sender.sendMessage(ChatColor.RED + "This player doesn't have an empty slot in their inventory!");
+                                    sender.sendMessage(Utils.color("&cThis player doesn't have an empty slot in their inventory!"));
                                 }
                             } else {
-                                sender.sendMessage(ChatColor.RED + "This player isn't online!");
+                                sender.sendMessage(Utils.color("&cThis player isn't online!"));
                             }
                         } else {
-                            sender.sendMessage(ChatColor.RED + "Please specify a player!");
+                            sender.sendMessage(Utils.color("&cPlease specify a player!"));
                         }
                         break;
                     case "reload":
@@ -94,21 +94,36 @@ public class VoidChestCommand implements TabExecutor {
                         main.getUtils().runSellTimer();
                         Bukkit.getScheduler().cancelTask(main.getUtils().getSaveTimerID());
                         main.getUtils().runSaveTimer();
-                        sender.sendMessage(ChatColor.GREEN + "Reloaded the config! Most values have been instantly updated.");
+                        sender.sendMessage(Utils.color("&aReloaded the config! Most values have been instantly updated."));
+                        break;
+                    case "bypass":
+                        if (sender instanceof Player) {
+                            Player p = (Player)sender;
+                            if (main.getUtils().getBypassPlayers().contains(p)) {
+                                main.getUtils().getBypassPlayers().remove(p);
+                                sender.sendMessage(Utils.color("&cYou are no longer bypassing!"));
+                            } else {
+                                main.getUtils().getBypassPlayers().add(p);
+                                sender.sendMessage(Utils.color("&aYou are now bypassing most checks!"));
+                            }
+                        } else {
+                            sender.sendMessage(Utils.color("&cYou can only bypass as a player ingame!."));
+                        }
                         break;
                     default:
-                        sender.sendMessage(ChatColor.RED + "Invalid argument!");
+                        sender.sendMessage(Utils.color("&cInvalid argument!"));
                         break;
                 }
-            } else { //TODO bypass
-                sender.sendMessage(ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "--------------" + ChatColor.GRAY +"[" + ChatColor.GOLD + ChatColor.BOLD + " VoidChest " + ChatColor.GRAY + "]" + ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "--------------");
-                sender.sendMessage(ChatColor.GOLD + "● /vc give <player> [amount] " + ChatColor.GRAY + "- Give a player a voidchest");
-                sender.sendMessage(ChatColor.GOLD + "● /vc reload " + ChatColor.GRAY + "- Reload the config");
-                sender.sendMessage(ChatColor.GRAY.toString() + ChatColor.ITALIC + "v" + main.getDescription().getVersion() + " by Biscut");
-                sender.sendMessage(ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "-----------------------------------------");
+            } else {
+                sender.sendMessage(Utils.color("&7&m--------------&7[&6&b VoidChest &7]&7&m--------------"));
+                sender.sendMessage(Utils.color("&6● /vc give <player> [amount]  &7- Give a player a voidchest"));
+                sender.sendMessage(Utils.color("&6● /vc bypass &7- Bypass all restrictions for placing/breaking voidchests"));
+                sender.sendMessage(Utils.color("&6● /vc reload &7- Reload the config"));
+                sender.sendMessage(Utils.color("&7&ov" + main.getDescription().getVersion() + " by Biscut"));
+                sender.sendMessage(Utils.color("&7&m-----------------------------------------"));
             }
         } else {
-            if (!main.getConfigUtils().getNoPermissionCommand().equals("")) sender.sendMessage(main.getConfigUtils().getNoPermissionCommand());
+            if (!main.getConfigValues().getNoPermissionCommand().equals("")) sender.sendMessage(main.getConfigValues().getNoPermissionCommand());
         }
         return false;
     }

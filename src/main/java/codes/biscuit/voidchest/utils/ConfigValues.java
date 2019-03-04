@@ -12,13 +12,13 @@ import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-public class ConfigUtils {
+public class ConfigValues {
 
     private VoidChest main;
     private File locationsFile;
     private YamlConfiguration locationsConfig;
 
-    public ConfigUtils(VoidChest main) {
+    public ConfigValues(VoidChest main) {
         locationsFile = new File("plugins/VoidChest/locations.yml");
         this.main = main;
     }
@@ -45,9 +45,9 @@ public class ConfigUtils {
                 for (String location : locationsConfig.getStringList("locations." + key)) {
                     String[] splitLocation = location.split(Pattern.quote("|"));
                     World world = Bukkit.getWorld(splitLocation[0]);
-                    Double x = Double.parseDouble(splitLocation[1]);
-                    Double y = Double.parseDouble(splitLocation[2]);
-                    Double z = Double.parseDouble(splitLocation[3]);
+                    double x = Double.parseDouble(splitLocation[1]);
+                    double y = Double.parseDouble(splitLocation[2]);
+                    double z = Double.parseDouble(splitLocation[3]);
                     Location loc = new Location(world, Location.locToBlock(x), Location.locToBlock(y), Location.locToBlock(z));
                     main.getUtils().getChestLocations().put(loc, p);
                 }
@@ -62,7 +62,7 @@ public class ConfigUtils {
     }
 
     long getSellInterval() {
-        long ticks = Math.round(main.getConfig().getDouble("sell-interval") * 20);
+        long ticks = Math.round(main.getConfig().getDouble("sell-time") * 20);
         if (ticks >= 1) {
             return ticks;
         } else {
@@ -71,7 +71,7 @@ public class ConfigUtils {
     }
 
     long getSaveInterval() {
-        long ticks = Math.round(main.getConfig().getDouble("save-interval") * 20);
+        long ticks = Math.round(main.getConfig().getDouble("save-time") * 20);
         if (ticks >= 1) {
             return ticks;
         } else {
@@ -238,5 +238,17 @@ public class ConfigUtils {
 
     public String minimumFactionsRank() {
         return main.getConfig().getString("minimum-factions-rank-break").toLowerCase();
+    }
+
+    public boolean workaroundEnabled() {
+        return main.getConfig().getBoolean("shopguiplus-workaround");
+    }
+
+    double getConfigVersion() {
+        return main.getConfig().getDouble("config-version");
+    }
+
+    public boolean sendUpdateMessages() {
+        return main.getConfig().getBoolean("update-messages");
     }
 }

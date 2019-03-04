@@ -13,6 +13,10 @@ class EssentialsHook {
     }
 
     double getSellPrice(ItemStack sellItem) {
-        return essentials.getWorth().getPrice(sellItem).doubleValue() * sellItem.getAmount(); //TODO is multiplication nessasary?
+        try {
+            return essentials.getWorth().getPrice(sellItem).doubleValue() * sellItem.getAmount();
+        } catch (NullPointerException ex) {
+            return 0;
+        }
     }
 }

@@ -4,7 +4,7 @@ import codes.biscuit.voidchest.commands.VoidChestCommand;
 import codes.biscuit.voidchest.events.OtherEvents;
 import codes.biscuit.voidchest.events.PlayerEvents;
 import codes.biscuit.voidchest.hooks.HookUtils;
-import codes.biscuit.voidchest.utils.ConfigUtils;
+import codes.biscuit.voidchest.utils.ConfigValues;
 import codes.biscuit.voidchest.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -13,7 +13,7 @@ import java.io.IOException;
 
 public class VoidChest extends JavaPlugin {
 
-    private ConfigUtils configUtils;
+    private ConfigValues configValues;
     private Utils utils;
     private HookUtils hookUtils;
 
@@ -22,18 +22,18 @@ public class VoidChest extends JavaPlugin {
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
         getCommand("voidchest").setExecutor(new VoidChestCommand(this));
-        this.configUtils = new ConfigUtils(this);
+        this.configValues = new ConfigValues(this);
         this.utils = new Utils(this);
         this.hookUtils =  new HookUtils(this);
         Bukkit.getPluginManager().registerEvents(new PlayerEvents(this), this);
         Bukkit.getPluginManager().registerEvents(new OtherEvents(this), this);
-        configUtils.setupVoidChests();
+        configValues.setupVoidChests();
     }
 
     @Override
     public void onDisable() {
         try {
-            configUtils.getLocationsConfig().save(configUtils.getLocationsFile());
+            configValues.getLocationsConfig().save(configValues.getLocationsFile());
             getLogger().info("Saved voidchest locations!");
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -41,8 +41,8 @@ public class VoidChest extends JavaPlugin {
         }
     }
 
-    public ConfigUtils getConfigUtils() {
-        return this.configUtils;
+    public ConfigValues getConfigValues() {
+        return this.configValues;
     }
 
     public Utils getUtils() {

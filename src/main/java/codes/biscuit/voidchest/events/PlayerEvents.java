@@ -32,14 +32,24 @@ public class PlayerEvents implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onVoidChestPlace(PlayerInteractEvent e) {
-        if (!e.isCancelled()) {
-            if (e.getPlayer().hasPermission("voidchest.place")) {
+        boolean bypassing = main.getUtils().getBypassPlayers().contains(e.getPlayer());
+        if (!e.isCancelled() || bypassing) {
+            if (e.getPlayer().hasPermission("voidchest.place") || bypassing) {
                 if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && e.getItem() != null && main.getUtils().isVoidChest(e.getItem())) {
                     e.setCancelled(true);
                     Block newBlock;
+                    Material longGrass = null;
+                    try {
+                        longGrass = Material.valueOf("LONG_GRASS");
+                    } catch (IllegalArgumentException ex) {
+                        try {
+                            longGrass = Material.valueOf("TALL_GRASS");
+                        } catch (IllegalArgumentException ignored) {
+                        }
+                    }
                     if (e.getClickedBlock().getState() instanceof InventoryHolder && !e.getPlayer().isSneaking()) {
                         return;
-                    } else if (e.getClickedBlock().getType().equals(Material.LONG_GRASS)) {
+                    } else if (e.getClickedBlock().getType().equals(longGrass)) {
                         newBlock = e.getClickedBlock(); // Blocks place directly on grass
                     } else {
                         newBlock = e.getClickedBlock().getRelative(e.getBlockFace());
@@ -53,7 +63,8 @@ public class PlayerEvents implements Listener {
                             newBlock.getRelative(BlockFace.WEST)};
                     for (Block currentBlock : surroundingBlocks) {
                         if (currentBlock.getType().equals(Material.CHEST) && !main.getUtils().getChestLocations().containsKey(currentBlock.getLocation())) {
-                            if (!main.getConfigUtils().getMessageVoidChestBeside().equals("")) e.getPlayer().sendMessage(main.getConfigUtils().getMessageVoidChestBeside());
+                            if (!main.getConfigValues().getMessageVoidChestBeside().equals(""))
+                                e.getPlayer().sendMessage(main.getConfigValues().getMessageVoidChestBeside());
                             return;
                         }
                     }
@@ -68,24 +79,28 @@ public class PlayerEvents implements Listener {
                     } catch (Exception ex) {
                         try {
                             digSound = Sound.valueOf("BLOCK_WOOD_PLACE"); // 1.9+
-                        } catch (Exception ignored) {}
+                        } catch (Exception ignored) {
+                        }
                     }
-                    if (digSound != null) e.getPlayer().getWorld().playSound(e.getPlayer().getLocation(), digSound, 1, 0.8F); // Pitch is by ear
+                    if (digSound != null)
+                        e.getPlayer().getWorld().playSound(e.getPlayer().getLocation(), digSound, 1, 0.8F); // Pitch is by ear
                     if (e.getPlayer().getGameMode().equals(GameMode.SURVIVAL) || e.getPlayer().getGameMode().equals(GameMode.ADVENTURE)) {
                         ItemStack removeItem = e.getItem();
                         removeItem.setAmount(e.getItem().getAmount() - 1);
                         e.getPlayer().setItemInHand(removeItem);
                     }
                     main.getUtils().addConfigLocation(newBlock.getLocation(), e.getPlayer());
-                    if (!main.getConfigUtils().getMessagePlace().equals("")) e.getPlayer().sendMessage(main.getConfigUtils().getMessagePlace());
+                    if (!main.getConfigValues().getMessagePlace().equals(""))
+                        e.getPlayer().sendMessage(main.getConfigValues().getMessagePlace());
                 }
             } else {
-                if (!main.getConfigUtils().getNoPermissionPlaceMessage().equals("")) e.getPlayer().sendMessage(main.getConfigUtils().getNoPermissionPlaceMessage());
+                if (!main.getConfigValues().getNoPermissionPlaceMessage().equals(""))
+                    e.getPlayer().sendMessage(main.getConfigValues().getNoPermissionPlaceMessage());
             }
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onChestPlace(BlockPlaceEvent e) {
         if (e.getBlock().getType().equals(Material.CHEST)) {
             Block[] surroundingBlocks = {e.getBlock().getRelative(BlockFace.NORTH),
@@ -94,7 +109,7 @@ public class PlayerEvents implements Listener {
                     e.getBlock().getRelative(BlockFace.WEST)};
             for (Block currentBlock : surroundingBlocks) {
                 if (currentBlock.getType().equals(Material.CHEST) && main.getUtils().getChestLocations().containsKey(currentBlock.getLocation())) {
-                    if (!main.getConfigUtils().getMessageChestBeside().equals("")) e.getPlayer().sendMessage(main.getConfigUtils().getMessageChestBeside());
+                    if (!main.getConfigValues().getMessageChestBeside().equals("")) e.getPlayer().sendMessage(main.getConfigValues().getMessageChestBeside());
                     e.setCancelled(true);
                     return;
                 }
@@ -102,34 +117,41 @@ public class PlayerEvents implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onVoidChestBreak(BlockBreakEvent e) {
-        Block b = e.getBlock();
-        if (b.getType().equals(Material.CHEST) &&
-                main.getUtils().getChestLocations().containsKey(b.getLocation())) {
-            e.setCancelled(true);
-            breakVoidChest(e.getPlayer(), b);
+        boolean bypassing = main.getUtils().getBypassPlayers().contains(e.getPlayer());
+        if (!e.isCancelled() || bypassing) {
+            Block b = e.getBlock();
+            if (b.getType().equals(Material.CHEST) &&
+                    main.getUtils().getChestLocations().containsKey(b.getLocation())) {
+                e.setCancelled(true);
+                breakVoidChest(e.getPlayer(), b);
+            }
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onVoidChestDamage(BlockDamageEvent e) {
-        Block b = e.getBlock();
-        if (main.getConfigUtils().sneakToBreak() && b.getType().equals(Material.CHEST) &&
-                main.getUtils().getChestLocations().containsKey(b.getLocation()) && e.getPlayer().isSneaking()) {
-            e.setCancelled(true);
-            breakVoidChest(e.getPlayer(), b);
+        boolean bypassing = main.getUtils().getBypassPlayers().contains(e.getPlayer());
+        if (!e.isCancelled() || bypassing) {
+            Block b = e.getBlock();
+            if (main.getConfigValues().sneakToBreak() && b.getType().equals(Material.CHEST) &&
+                    main.getUtils().getChestLocations().containsKey(b.getLocation()) && e.getPlayer().isSneaking()) {
+                e.setCancelled(true);
+                breakVoidChest(e.getPlayer(), b);
+            }
         }
     }
 
     private void breakVoidChest(Player p, Block b) {
-        if (main.getHookUtils().canBreakChest(b.getLocation(), p)) {
-            if (main.getHookUtils().isMinimumFaction(p, b.getLocation())) {
-                if (main.getConfigUtils().breakIntoInventory()) {
-                    if (main.getConfigUtils().breakDontDropIfFull()) {
+        boolean bypassing = main.getUtils().getBypassPlayers().contains(p);
+        if (bypassing || main.getHookUtils().canBreakChest(b.getLocation(), p)) {
+            if (bypassing || main.getHookUtils().isMinimumFaction(p, b.getLocation())) {
+                if (main.getConfigValues().breakIntoInventory()) {
+                    if (main.getConfigValues().breakDontDropIfFull()) {
                         if (p.getInventory().firstEmpty() == -1) {
-                            if (!main.getConfigUtils().getMessageNoSpace().equals(""))
-                                p.sendMessage(main.getConfigUtils().getMessageNoSpace());
+                            if (!main.getConfigValues().getMessageNoSpace().equals(""))
+                                p.sendMessage(main.getConfigValues().getMessageNoSpace());
                             return;
                         }
                     }
@@ -155,13 +177,13 @@ public class PlayerEvents implements Listener {
                     main.getUtils().removeConfigLocation(b.getLocation(), p);
                     p.getWorld().dropItemNaturally(b.getLocation(), main.getUtils().getVoidChestItemStack(1));
                 }
-                if (!main.getConfigUtils().getMessageRemove().equals(""))
-                    p.sendMessage(main.getConfigUtils().getMessageRemove());
+                if (!main.getConfigValues().getMessageRemove().equals(""))
+                    p.sendMessage(main.getConfigValues().getMessageRemove());
             } else {
-                if (!main.getConfigUtils().getNotMinimumFactionMessage().equals("")) p.sendMessage(main.getConfigUtils().getNotMinimumFactionMessage());
+                if (!main.getConfigValues().getNotMinimumFactionMessage().equals("")) p.sendMessage(main.getConfigValues().getNotMinimumFactionMessage());
             }
         } else {
-            if (!main.getConfigUtils().getMessageNotOwner().equals("")) p.sendMessage(main.getConfigUtils().getMessageNotOwner());
+            if (!main.getConfigValues().getMessageNotOwner().equals("")) p.sendMessage(main.getConfigValues().getMessageNotOwner());
         }
     }
 }

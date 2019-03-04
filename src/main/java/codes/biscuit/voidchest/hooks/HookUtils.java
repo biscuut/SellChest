@@ -14,7 +14,7 @@ import java.util.Map;
 public class HookUtils {
 
     private VoidChest main;
-    Economy economy;
+    private Economy economy;
     private Map<Hooks, Object> enabledHooks = new HashMap<>();
 
     public HookUtils(VoidChest main) {
@@ -48,23 +48,31 @@ public class HookUtils {
     }
 
     public double getValue(ItemStack sellItem, Player p) {
-        if (main.getConfigUtils().essentialsHookEnabled()) {
+        if (main.getConfigValues().essentialsHookEnabled()) {
             return ((EssentialsHook)enabledHooks.get(Hooks.ESSENTIALS)).getSellPrice(sellItem);
-        } else if (main.getConfigUtils().shopGUIPlusHookEnabled()) {
-            return ((ShopGUIPlusHook)enabledHooks.get(Hooks.SHOPGUIPLUS)).getSellPrice(p, sellItem);
-        } else {
-            String itemString = sellItem.getType().toString().toLowerCase();
-            return main.getConfigUtils().getConfigPrice(itemString) * sellItem.getAmount();
+        } else if (main.getConfigValues().shopGUIPlusHookEnabled()) {
+            if (p == null) {
+                if (main.getConfigValues().workaroundEnabled()) {
+                    p = main.getServer().getOnlinePlayers().stream().findAny().orElse(null);
+                    if (p != null) {
+                        return ((ShopGUIPlusHook) enabledHooks.get(Hooks.SHOPGUIPLUS)).getSellPrice(p, sellItem);
+                    }
+                }
+            } else {
+                return ((ShopGUIPlusHook) enabledHooks.get(Hooks.SHOPGUIPLUS)).getSellPrice(p, sellItem);
+            }
         }
+        String itemString = sellItem.getType().toString().toLowerCase();
+        return main.getConfigValues().getConfigPrice(itemString) * sellItem.getAmount();
     }
 
     public void giveMoney(OfflinePlayer p, double amount, Location loc) {
-        MoneyRecipient mr = main.getConfigUtils().getMoneyRecipient();
+        MoneyRecipient mr = main.getConfigValues().getMoneyRecipient();
         FactionsUUIDHook factionsUUIDHook = ((FactionsUUIDHook)enabledHooks.get(Hooks.FACTIONSUUID));
         MassiveCoreHook massiveCoreHook = ((MassiveCoreHook)enabledHooks.get(Hooks.MASSIVECOREFACTIONS));
         ASkyblockHook aSkyblockHook = ((ASkyblockHook)enabledHooks.get(Hooks.ASKYBLOCK));
         PlotSquaredHook plotSquaredHook = ((PlotSquaredHook)enabledHooks.get(Hooks.PLOTSQUARED));
-        if (main.getConfigUtils().factionsHookEnabled()) {
+        if (main.getConfigValues().factionsHookEnabled()) {
             if (mr.equals(MoneyRecipient.FACTION_BALANCE)) {
                 if (factionsUUIDHook != null && factionsUUIDHook.moneyEnabled() && factionsUUIDHook.isPlayerClaim(loc)) {
                     factionsUUIDHook.addBalance(loc, amount);
@@ -82,12 +90,12 @@ public class HookUtils {
                     return;
                 }
             }
-        } else if (main.getConfigUtils().askyblockHookEnabled()) {
+        } else if (main.getConfigValues().askyblockHookEnabled()) {
             if (mr.equals(MoneyRecipient.ISLAND_OWNER) && aSkyblockHook != null && aSkyblockHook.isIsland(loc)) {
                 addPlayerMoney(aSkyblockHook.getIslandOwner(loc), amount);
                 return;
             }
-        } else if (main.getConfigUtils().plotSquaredHookEnabled()) {
+        } else if (main.getConfigValues().plotSquaredHookEnabled()) {
             if (mr.equals(MoneyRecipient.PLOT_OWNER) && plotSquaredHook != null && plotSquaredHook.isPlot(loc)) {
                 addPlayerMoney(plotSquaredHook.getPlotOwner(loc), amount);
                 return;
@@ -97,17 +105,17 @@ public class HookUtils {
     }
 
     public boolean isMinimumFaction(Player p, Location loc) {
-        MoneyRecipient mr = main.getConfigUtils().getMoneyRecipient();
+        MoneyRecipient mr = main.getConfigValues().getMoneyRecipient();
         FactionsUUIDHook factionsUUIDHook = ((FactionsUUIDHook)enabledHooks.get(Hooks.FACTIONSUUID));
         MassiveCoreHook massiveCoreHook = ((MassiveCoreHook)enabledHooks.get(Hooks.MASSIVECOREFACTIONS));
-        if (main.getConfigUtils().factionsHookEnabled()) {
+        if (main.getConfigValues().factionsHookEnabled()) {
             if (mr.equals(MoneyRecipient.FACTION_BALANCE) || mr.equals(MoneyRecipient.FACTION_LEADER)) {
                 if (factionsUUIDHook != null) {
                     if (factionsUUIDHook.isWilderness(loc)) return true;
-                    return factionsUUIDHook.checkRole(p, main.getConfigUtils().minimumFactionsRank());
+                    return factionsUUIDHook.checkRole(p, main.getConfigValues().minimumFactionsRank());
                 } else if (massiveCoreHook != null) {
                     if (massiveCoreHook.isWilderness(loc)) return true;
-                    return massiveCoreHook.checkRole(p, main.getConfigUtils().minimumFactionsRank());
+                    return massiveCoreHook.checkRole(p, main.getConfigValues().minimumFactionsRank());
                 }
             }
         }
@@ -115,15 +123,15 @@ public class HookUtils {
     }
 
     public boolean canBreakChest(Location loc, Player p) {
-        if (main.getConfigUtils().anyoneCanBreak()) {
+        if (main.getConfigValues().anyoneCanBreak()) {
             return true;
         }
-        MoneyRecipient mr = main.getConfigUtils().getMoneyRecipient();
+        MoneyRecipient mr = main.getConfigValues().getMoneyRecipient();
         FactionsUUIDHook factionsUUIDHook = ((FactionsUUIDHook)enabledHooks.get(Hooks.FACTIONSUUID));
         MassiveCoreHook massiveCoreHook = ((MassiveCoreHook)enabledHooks.get(Hooks.MASSIVECOREFACTIONS));
         ASkyblockHook aSkyblockHook = ((ASkyblockHook)enabledHooks.get(Hooks.ASKYBLOCK));
         PlotSquaredHook plotSquaredHook = ((PlotSquaredHook)enabledHooks.get(Hooks.PLOTSQUARED));
-        if (main.getConfigUtils().factionsHookEnabled()) {
+        if (main.getConfigValues().factionsHookEnabled()) {
             if (mr.equals(MoneyRecipient.FACTION_BALANCE) || mr.equals(MoneyRecipient.FACTION_LEADER)) {
                 if (factionsUUIDHook != null) {
                     return factionsUUIDHook.factionIsSame(loc, p);
@@ -131,11 +139,11 @@ public class HookUtils {
                     return massiveCoreHook.factionIsSame(loc, p);
                 }
             }
-        } else if (main.getConfigUtils().askyblockHookEnabled()) {
+        } else if (main.getConfigValues().askyblockHookEnabled()) {
             if (mr.equals(MoneyRecipient.ISLAND_OWNER) && aSkyblockHook != null) {
                 return aSkyblockHook.islandIsSame(loc, p);
             }
-        } else if (main.getConfigUtils().plotSquaredHookEnabled()) {
+        } else if (main.getConfigValues().plotSquaredHookEnabled()) {
             if (mr.equals(MoneyRecipient.PLOT_OWNER) && plotSquaredHook != null) {
                 return plotSquaredHook.plotIsSame(loc, p);
             }
@@ -145,6 +153,10 @@ public class HookUtils {
 
     private void addPlayerMoney(OfflinePlayer p, double amount) {
         economy.depositPlayer(p, amount);
+    }
+
+    Economy getEconomy() {
+        return economy;
     }
 
     enum Hooks {

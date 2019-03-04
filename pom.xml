@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>xyz.biscut</groupId>
+    <groupId>codes.biscuit</groupId>
     <artifactId>VoidChest</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
@@ -55,20 +55,14 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot</artifactId>
-            <version>1.8.8-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>VaultAPI</artifactId>
             <version>1.6</version>
         </dependency>
         <dependency>
             <groupId>net.brcdev</groupId>
-            <artifactId>shopgui</artifactId>
-            <version>1.19.0-SNAPSHOT</version>
+            <artifactId>ShopGUIPlus</artifactId>
+            <version>1.19.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -101,8 +95,8 @@
         </dependency>
         <dependency>
             <groupId>com.plotsquared</groupId>
-            <artifactId>plotsquared</artifactId>
-            <version>4.0pre</version>
+            <artifactId>PlotSquared</artifactId>
+            <version>19.02.21</version>
         </dependency>
     </dependencies>
 </project>

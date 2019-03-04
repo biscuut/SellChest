@@ -15,7 +15,7 @@ class ASkyblockHook {
         return ASkyBlockAPI.getInstance().getIslandAt(loc) != null;
     }
 
-    // getIslandOwnedBy also includes members- so no, you're not stupid future self.
+    // Note to self: remember i'm not stupid- getIslandOwnedBy also includes members...
     boolean islandIsSame(Location loc, Player p) {
         return ASkyBlockAPI.getInstance().getIslandOwnedBy(p.getUniqueId()).equals(ASkyBlockAPI.getInstance().getIslandAt(loc));
     }

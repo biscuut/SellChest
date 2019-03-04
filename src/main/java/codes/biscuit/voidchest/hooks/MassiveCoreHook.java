@@ -28,10 +28,10 @@ class MassiveCoreHook {
     }
 
     @SuppressWarnings("deprecation")
-    void addBalance(Location loc, double amount) { //TODO check this to make sure
+    void addBalance(Location loc, double amount) {
         if (isPlayerClaim(loc)) {
             Faction faction = BoardColl.get().getFactionAt(PS.valueOf(loc));
-            hookUtils.economy.depositPlayer(Money.accountId(faction), amount);
+            hookUtils.getEconomy().depositPlayer(Money.accountId(faction), amount);
         }
     }
 

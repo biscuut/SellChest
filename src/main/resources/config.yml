@@ -9,18 +9,20 @@
 ###################################################
 
 # How often voidchests should sell their contents, in seconds.
-sell-interval: 1.0
+sell-time: 1.0
 
 # How often voidchest locations should save to config, in seconds (good for when crashes happen).
-save-interval: 300.0
+save-time: 300.0
 
 # Set to false if you don't want unsellable items to be cleared.
+# ex. if this is true and bedrock is found in a voidchest with a value of $0,
+# it will still be removed from the chest.
 remove-unsellable-items: true
 
 # Options: PLAYER, FACTION_LEADER, FACTION_BALANCE, ISLAND_OWNER, PLOT_OWNER;
 money-recipient: 'PLAYER'
 
-# Shift and punch the voidchest to drop it (recommended)
+# Shift and punch the voidchest to easily break & return a voidchest (recommended)
 sneak-punch-to-break: true
 
 # Drop the voidchest on the floor if the player's inventory is full when doing /vc give
@@ -37,12 +39,12 @@ break-drop-if-full: true
 # in the faction can break the chest.
 anyone-can-break: false
 
-# The minimum factions rank that can break voidchests.
-minimum-factions-rank-break: 'MEMBER' #TODO check these 2
+# The minimum factions rank that can break voidchests, only works if factions hook is enabled.
+minimum-factions-rank-break: 'MEMBER'
 
 # Customize the voidchest item.
 item:
-  material: 'CHEST'
+  material: 'CHEST' # Note, the physical block will always be a chest regardless of this material.
   name: '&6&lVoidChest'
   lore:
     - '&7Anything placed in this chest will be automatically sold'
@@ -51,10 +53,16 @@ item:
 
 hooks:
   essentials: true # Use the worth.yml from Essentials for prices
-  shopguiplus: false # Use prices from ShopGUI+ (can only get prices while the player, faction leader, or island owner is online.)
+  shopguiplus: false # Use prices from ShopGUI+ (unfortunately, I can only get prices while the player, faction leader, or island owner is online
+  # unless if shopguiplus-workaround is enabled- where it will then get the prices from any other random online player).
   askyblock: false
-  factions: false
+  factions: true
   plotsquared: false
+
+# Allow the plugin to fetch ShopGUI+ prices while the money recipient is offline.
+# This workaround will instead take the prices from any random online player. Would only recommend
+# using this if the shop prices are the same for all players in your server.
+shopguiplus-workaround: false
 
 # Customize messages from the plugin.
 messages:
@@ -69,8 +77,14 @@ messages:
   no-permission-command: '&cNo permission!'
   not-minimum-faction: '&cYou are not the minimum factions role!'
 
-# These prices will be used if none of the hooks above are enabled. # TODO <--
+# These prices will be used as a last resort if none of the hooks above are enabled.
 prices:
   dirt: 1.0
   bedrock: 2.0
   iron_ingot: 0.5
+
+# Set to false if you don't want your ops to get update messages. (Recommended: true)
+update-messages: true
+
+# Please do not change this!
+config-version: 1.0
