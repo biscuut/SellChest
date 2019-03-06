@@ -1,6 +1,7 @@
 package codes.biscuit.sellchest.events;
 
 import codes.biscuit.sellchest.SellChest;
+import codes.biscuit.sellchest.utils.ConfigValues;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -16,6 +17,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Chest;
@@ -63,8 +65,7 @@ public class PlayerEvents implements Listener {
                             newBlock.getRelative(BlockFace.WEST)};
                     for (Block currentBlock : surroundingBlocks) {
                         if (currentBlock.getType().equals(Material.CHEST) && !main.getUtils().getChestLocations().containsKey(currentBlock.getLocation())) {
-                            if (!main.getConfigValues().getMessageSellChestBeside().equals(""))
-                                e.getPlayer().sendMessage(main.getConfigValues().getMessageSellChestBeside());
+                            main.getUtils().sendMessage(e.getPlayer(), ConfigValues.Message.SELLCHEST_BESIDE);
                             return;
                         }
                     }
@@ -90,12 +91,10 @@ public class PlayerEvents implements Listener {
                         e.getPlayer().setItemInHand(removeItem);
                     }
                     main.getUtils().addConfigLocation(newBlock.getLocation(), e.getPlayer());
-                    if (!main.getConfigValues().getMessagePlace().equals(""))
-                        e.getPlayer().sendMessage(main.getConfigValues().getMessagePlace());
+                    main.getUtils().sendMessage(e.getPlayer(), ConfigValues.Message.PLACE);
                 }
             } else {
-                if (!main.getConfigValues().getNoPermissionPlaceMessage().equals(""))
-                    e.getPlayer().sendMessage(main.getConfigValues().getNoPermissionPlaceMessage());
+                main.getUtils().sendMessage(e.getPlayer(), ConfigValues.Message.NO_PERMISSION_PLACE);
             }
         }
     }
@@ -109,7 +108,7 @@ public class PlayerEvents implements Listener {
                     e.getBlock().getRelative(BlockFace.WEST)};
             for (Block currentBlock : surroundingBlocks) {
                 if (currentBlock.getType().equals(Material.CHEST) && main.getUtils().getChestLocations().containsKey(currentBlock.getLocation())) {
-                    if (!main.getConfigValues().getMessageChestBeside().equals("")) e.getPlayer().sendMessage(main.getConfigValues().getMessageChestBeside());
+                    main.getUtils().sendMessage(e.getPlayer(), ConfigValues.Message.CHEST_BESIDE);
                     e.setCancelled(true);
                     return;
                 }
@@ -150,8 +149,7 @@ public class PlayerEvents implements Listener {
                 if (main.getConfigValues().breakIntoInventory()) {
                     if (main.getConfigValues().breakDontDropIfFull()) {
                         if (p.getInventory().firstEmpty() == -1) {
-                            if (!main.getConfigValues().getMessageNoSpace().equals(""))
-                                p.sendMessage(main.getConfigValues().getMessageNoSpace());
+                            main.getUtils().sendMessage(p, ConfigValues.Message.NO_SPACE);
                             return;
                         }
                     }
@@ -177,13 +175,19 @@ public class PlayerEvents implements Listener {
                     main.getUtils().removeConfigLocation(b.getLocation(), p);
                     p.getWorld().dropItemNaturally(b.getLocation(), main.getUtils().getSellChestItemStack(1));
                 }
-                if (!main.getConfigValues().getMessageRemove().equals(""))
-                    p.sendMessage(main.getConfigValues().getMessageRemove());
+                main.getUtils().sendMessage(p, ConfigValues.Message.REMOVED);
             } else {
-                if (!main.getConfigValues().getNotMinimumFactionMessage().equals("")) p.sendMessage(main.getConfigValues().getNotMinimumFactionMessage());
+                main.getUtils().sendMessage(p, ConfigValues.Message.NOT_MINIMUM_FACTION);
             }
         } else {
-            if (!main.getConfigValues().getMessageNotOwner().equals("")) p.sendMessage(main.getConfigValues().getMessageNotOwner());
+            main.getUtils().sendMessage(p, ConfigValues.Message.NOT_OWNER);
+        }
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent e) {
+        if (main.getConfigValues().sendUpdateMessages() && e.getPlayer().isOp()) {
+            main.getUtils().checkUpdates(e.getPlayer());
         }
     }
 }

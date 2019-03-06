@@ -22,9 +22,10 @@ public class SellChest extends JavaPlugin {
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
         getCommand("sellchest").setExecutor(new SellChestCommand(this));
-        this.configValues = new ConfigValues(this);
-        this.utils = new Utils(this);
-        this.hookUtils =  new HookUtils(this);
+        configValues = new ConfigValues(this);
+        utils = new Utils(this);
+        utils.updateConfig(this);
+        hookUtils =  new HookUtils(this);
         Bukkit.getPluginManager().registerEvents(new PlayerEvents(this), this);
         Bukkit.getPluginManager().registerEvents(new OtherEvents(this), this);
         configValues.setupSellChests();

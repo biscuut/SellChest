@@ -7,6 +7,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
+import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -36,6 +37,12 @@ public class Utils {
 
     public static String color(String text) {
         return ChatColor.translateAlternateColorCodes('&', text);
+    }
+
+    public void sendMessage(CommandSender p, ConfigValues.Message message) {
+        if (!main.getConfigValues().getMessage(message).equals("")) {
+            p.sendMessage(main.getConfigValues().getMessage(message));
+        }
     }
 
     public boolean isVoidChest(ItemStack item) {
@@ -162,7 +169,7 @@ public class Utils {
         return bypassPlayers;
     }
 
-    public void updateConfig(SellChest main) { //TODO: Unused for the first version.
+    public void updateConfig(SellChest main) {
         if (main.getConfigValues().getConfigVersion() < 1.0) {
             Map<String, Object> oldValues = new HashMap<>();
             for (String oldKey : main.getConfig().getKeys(true)) {
@@ -180,9 +187,9 @@ public class Utils {
         }
     }
 
-    public void checkUpdates(Player p) { //TODO: Start using this on the second version
+    public void checkUpdates(Player p) {
         try {
-            URL url = new URL("https://api.spigotmc.org/legacy/update.php?resource=(ID HERE)");
+            URL url = new URL("https://api.spigotmc.org/legacy/update.php?resource=65352");
             URLConnection connection = url.openConnection();
             connection.setReadTimeout(5000);
             connection.addRequestProperty("User-Agent", "SellChest update checker");
@@ -207,7 +214,7 @@ public class Utils {
                     if (newestVersionNumbers.get(i) > thisVersionNumbers.get(i)) {
                         TextComponent newVersion = new TextComponent("A new version of SellChest, " + newestVersion + " is available. Download it by clicking here.");
                         newVersion.setColor(ChatColor.RED);
-                        newVersion.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "(ADD LINK)"));
+                        newVersion.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/sellchest-1-8-1-13-automatically-sell-items-in-chests-voidchests.65352/"));
                         p.spigot().sendMessage(newVersion);
                         break;
                     } else if (thisVersionNumbers.get(i) > newestVersionNumbers.get(i)) {

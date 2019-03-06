@@ -1,6 +1,7 @@
 package codes.biscuit.sellchest.commands;
 
 import codes.biscuit.sellchest.SellChest;
+import codes.biscuit.sellchest.utils.ConfigValues;
 import codes.biscuit.sellchest.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -123,7 +124,7 @@ public class SellChestCommand implements TabExecutor {
                 sender.sendMessage(Utils.color("&7&m-----------------------------------------"));
             }
         } else {
-            if (!main.getConfigValues().getNoPermissionCommand().equals("")) sender.sendMessage(main.getConfigValues().getNoPermissionCommand());
+            main.getUtils().sendMessage(sender, ConfigValues.Message.NO_PERMISSION_COMMAND);
         }
         return false;
     }

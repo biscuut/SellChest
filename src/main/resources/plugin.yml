@@ -1,5 +1,5 @@
 name: SellChest
-version: 1.0
+version: ${version}
 api-version: 1.13
 main: codes.biscuit.sellchest.SellChest
 author: Biscut
@@ -15,5 +15,5 @@ permissions:
     description: Access to the main sellchest command.
     default: op
   sellchest.place:
-    description: Ability to place sellchest.
+    description: Ability to place sellchests.
     default: true

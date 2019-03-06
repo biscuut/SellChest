@@ -83,42 +83,6 @@ public class ConfigValues {
         return main.getConfig().getBoolean("remove-unsellable-items");
     }
 
-    public String getMessageSellChestBeside() {
-        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.sellchest-beside-chest"));
-    }
-
-    public String getMessageChestBeside() {
-        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.chest-beside-sellchest"));
-    }
-
-    public String getMessageRemove() {
-        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.sellchest-removed"));
-    }
-
-    public String getMessageNoSpace() {
-        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.sellchest-remove-nospace"));
-    }
-
-    public String getMessageNotOwner() {
-        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.sellchest-remove-notowner"));
-    }
-
-    public String getMessagePlace() {
-        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.sellchest-place"));
-    }
-
-    public String getNoPermissionPlaceMessage() {
-        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.no-permission-place"));
-    }
-
-    public String getNoPermissionCommand() {
-        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.no-permission-command"));
-    }
-
-    public String getNotMinimumFactionMessage() {
-        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.not-minimum-faction"));
-    }
-
     public String getMessageReceive(int giveAmount) {
         String message = ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.sellchest-receive"));
         return message.replace("{amount}", String.valueOf(giveAmount));
@@ -250,5 +214,31 @@ public class ConfigValues {
 
     public boolean sendUpdateMessages() {
         return main.getConfig().getBoolean("update-messages");
+    }
+
+    String getMessage(Message message) {
+        return Utils.color(main.getConfig().getString(message.getPath()));
+    }
+
+    public enum Message {
+        SELLCHEST_BESIDE("sellchest-beside-chest"),
+        CHEST_BESIDE("chest-beside-sellchest"),
+        REMOVED("sellchest-removed"),
+        NO_SPACE("sellchest-remove-nospace"),
+        NOT_OWNER("sellchest-remove-notowner"),
+        PLACE("sellchest-place"),
+        NO_PERMISSION_PLACE("no-permission-place"),
+        NO_PERMISSION_COMMAND("no-permission-command"),
+        NOT_MINIMUM_FACTION("not-minimum-faction");
+
+        private String path;
+
+        Message(String path) {
+            this.path = "messages."+path;
+        }
+
+        public String getPath() {
+            return path;
+        }
     }
 }
