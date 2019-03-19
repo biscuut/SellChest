@@ -5,10 +5,13 @@ import codes.biscuit.sellchest.hooks.HookUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -84,16 +87,16 @@ public class ConfigValues {
     }
 
     public String getMessageReceive(int giveAmount) {
-        String message = ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("messages.sellchest-receive"));
-        return message.replace("{amount}", String.valueOf(giveAmount));
+        return getMessage(Message.RECEIVED).replace("{amount}", String.valueOf(giveAmount));
     }
 
+    String getReachedLimitMessage(int limit) {
+        return getMessage(Message.REACHED_LIMIT).replace("{limit}", String.valueOf(limit));
+    }
+
+
     List<String> getChestLore() {
-        List<String> lore = main.getConfig().getStringList("item.lore");
-        for (int i = 0; i < lore.size(); i++) {
-            lore.set(i, ChatColor.translateAlternateColorCodes('&', lore.get(i)));
-        }
-        return lore;
+        return main.getUtils().colorLore(main.getConfig().getStringList("item.lore"));
     }
 
     public YamlConfiguration getLocationsConfig() {
@@ -108,43 +111,8 @@ public class ConfigValues {
         return main.getConfig().getBoolean("item.glow");
     }
 
-    Material getItemMaterial() {
-        String rawMaterial = main.getConfig().getString("item.material");
-        Material mat;
-        if (rawMaterial.contains(":")) {
-            String[] materialSplit = rawMaterial.split(":");
-            try {
-                mat = Material.valueOf(materialSplit[0]);
-            } catch (IllegalArgumentException ex) {
-                mat = Material.CHEST;
-                main.getLogger().severe("Your chest item material is invalid!");
-            }
-        } else {
-            try {
-                mat = Material.valueOf(rawMaterial);
-            } catch (IllegalArgumentException ex) {
-                mat = Material.CHEST;
-                main.getLogger().severe("Your chest item material is invalid!");
-            }
-        }
-        return mat;
-    }
-
-    short getItemDamage() {
-        String rawDamage = main.getConfig().getString("item.material");
-        if (rawDamage.contains(":")) {
-            String[] materialSplit = rawDamage.split(":");
-            short damage;
-            try {
-                damage = Short.valueOf(materialSplit[1]);
-            } catch (IllegalArgumentException ex) {
-                damage = 1;
-                main.getLogger().severe("Your chest item damage is invalid!");
-            }
-            return damage;
-        } else {
-            return 0;
-        }
+    ItemStack getItem() {
+        return main.getUtils().itemFromString(main.getConfig().getString("item.material"));
     }
 
     public boolean essentialsHookEnabled() {
@@ -216,6 +184,17 @@ public class ConfigValues {
         return main.getConfig().getBoolean("update-messages");
     }
 
+    Map<String, Integer> getChestLimits() {
+        Map<String, Integer> limits = new HashMap<>();
+        for (String limit : main.getConfig().getConfigurationSection("chest-limits").getKeys(false)) {
+            limits.put(limit, main.getConfig().getInt("chest-limits."+limit));
+        }
+        if (!limits.containsKey("default")) {
+            limits.put("default", 0);
+        }
+        return limits;
+    }
+
     String getMessage(Message message) {
         return Utils.color(main.getConfig().getString(message.getPath()));
     }
@@ -224,12 +203,14 @@ public class ConfigValues {
         SELLCHEST_BESIDE("sellchest-beside-chest"),
         CHEST_BESIDE("chest-beside-sellchest"),
         REMOVED("sellchest-removed"),
+        RECEIVED("sellchest-receive"),
         NO_SPACE("sellchest-remove-nospace"),
         NOT_OWNER("sellchest-remove-notowner"),
         PLACE("sellchest-place"),
         NO_PERMISSION_PLACE("no-permission-place"),
         NO_PERMISSION_COMMAND("no-permission-command"),
-        NOT_MINIMUM_FACTION("not-minimum-faction");
+        NOT_MINIMUM_FACTION("not-minimum-faction"),
+        REACHED_LIMIT("reached-limit");
 
         private String path;
 

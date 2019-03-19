@@ -34,67 +34,72 @@ public class PlayerEvents implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onVoidChestPlace(PlayerInteractEvent e) {
-        boolean bypassing = main.getUtils().getBypassPlayers().contains(e.getPlayer());
+        Player p = e.getPlayer();
+        boolean bypassing = main.getUtils().getBypassPlayers().contains(p);
         if (!e.isCancelled() || bypassing) {
-            if (e.getPlayer().hasPermission("sellchest.place") || bypassing) {
+            if (p.hasPermission("sellchest.place") || bypassing) {
                 if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && e.getItem() != null && main.getUtils().isVoidChest(e.getItem())) {
-                    e.setCancelled(true);
-                    Block newBlock;
-                    Material longGrass = null;
-                    try {
-                        longGrass = Material.valueOf("LONG_GRASS");
-                    } catch (IllegalArgumentException ex) {
+                    if (bypassing || !main.getUtils().reachedLimit(p)) {
+                        e.setCancelled(true);
+                        Block newBlock;
+                        Material longGrass = null;
                         try {
-                            longGrass = Material.valueOf("TALL_GRASS");
-                        } catch (IllegalArgumentException ignored) {
+                            longGrass = Material.valueOf("LONG_GRASS");
+                        } catch (IllegalArgumentException ex) {
+                            try {
+                                longGrass = Material.valueOf("TALL_GRASS");
+                            } catch (IllegalArgumentException ignored) {
+                            }
                         }
-                    }
-                    if (e.getClickedBlock().getState() instanceof InventoryHolder && !e.getPlayer().isSneaking()) {
-                        return;
-                    } else if (e.getClickedBlock().getType().equals(longGrass)) {
-                        newBlock = e.getClickedBlock(); // Blocks place directly on grass
+                        if (e.getClickedBlock().getState() instanceof InventoryHolder && !p.isSneaking()) {
+                            return;
+                        } else if (e.getClickedBlock().getType().equals(longGrass)) {
+                            newBlock = e.getClickedBlock(); // Blocks place directly on grass
+                        } else {
+                            newBlock = e.getClickedBlock().getRelative(e.getBlockFace());
+                            if (!newBlock.getType().equals(Material.AIR)) { // For hackers
+                                return;
+                            }
+                        }
+                        Block[] surroundingBlocks = {newBlock.getRelative(BlockFace.NORTH),
+                                newBlock.getRelative(BlockFace.EAST),
+                                newBlock.getRelative(BlockFace.SOUTH),
+                                newBlock.getRelative(BlockFace.WEST)};
+                        for (Block currentBlock : surroundingBlocks) {
+                            if (currentBlock.getType().equals(Material.CHEST) && !main.getUtils().getChestLocations().containsKey(currentBlock.getLocation())) {
+                                main.getUtils().sendMessage(p, ConfigValues.Message.SELLCHEST_BESIDE);
+                                return;
+                            }
+                        }
+                        newBlock.setType(Material.CHEST);
+                        BlockState state = newBlock.getState();
+                        Chest chest = new Chest(main.getUtils().getOppositeDirection(p));
+                        state.setData(chest);
+                        state.update();
+                        Sound digSound = null;
+                        try {
+                            digSound = Sound.valueOf("DIG_WOOD"); // Sound for 1.8
+                        } catch (Exception ex) {
+                            try {
+                                digSound = Sound.valueOf("BLOCK_WOOD_PLACE"); // 1.9+
+                            } catch (Exception ignored) {
+                            }
+                        }
+                        if (digSound != null)
+                            p.getWorld().playSound(p.getLocation(), digSound, 1, 0.8F); // Pitch is by ear
+                        if (p.getGameMode().equals(GameMode.SURVIVAL) || p.getGameMode().equals(GameMode.ADVENTURE)) {
+                            ItemStack removeItem = e.getItem();
+                            removeItem.setAmount(e.getItem().getAmount() - 1);
+                            p.setItemInHand(removeItem);
+                        }
+                        main.getUtils().addConfigLocation(newBlock.getLocation(), e.getPlayer());
+                        main.getUtils().sendMessage(p, ConfigValues.Message.PLACE);
                     } else {
-                        newBlock = e.getClickedBlock().getRelative(e.getBlockFace());
-                        if (!newBlock.getType().equals(Material.AIR)) { // For hackers
-                            return;
-                        }
+                        e.setCancelled(true);
                     }
-                    Block[] surroundingBlocks = {newBlock.getRelative(BlockFace.NORTH),
-                            newBlock.getRelative(BlockFace.EAST),
-                            newBlock.getRelative(BlockFace.SOUTH),
-                            newBlock.getRelative(BlockFace.WEST)};
-                    for (Block currentBlock : surroundingBlocks) {
-                        if (currentBlock.getType().equals(Material.CHEST) && !main.getUtils().getChestLocations().containsKey(currentBlock.getLocation())) {
-                            main.getUtils().sendMessage(e.getPlayer(), ConfigValues.Message.SELLCHEST_BESIDE);
-                            return;
-                        }
-                    }
-                    newBlock.setType(Material.CHEST);
-                    BlockState state = newBlock.getState();
-                    Chest chest = new Chest(main.getUtils().getOppositeDirection(e.getPlayer()));
-                    state.setData(chest);
-                    state.update();
-                    Sound digSound = null;
-                    try {
-                        digSound = Sound.valueOf("DIG_WOOD"); // Sound for 1.8
-                    } catch (Exception ex) {
-                        try {
-                            digSound = Sound.valueOf("BLOCK_WOOD_PLACE"); // 1.9+
-                        } catch (Exception ignored) {
-                        }
-                    }
-                    if (digSound != null)
-                        e.getPlayer().getWorld().playSound(e.getPlayer().getLocation(), digSound, 1, 0.8F); // Pitch is by ear
-                    if (e.getPlayer().getGameMode().equals(GameMode.SURVIVAL) || e.getPlayer().getGameMode().equals(GameMode.ADVENTURE)) {
-                        ItemStack removeItem = e.getItem();
-                        removeItem.setAmount(e.getItem().getAmount() - 1);
-                        e.getPlayer().setItemInHand(removeItem);
-                    }
-                    main.getUtils().addConfigLocation(newBlock.getLocation(), e.getPlayer());
-                    main.getUtils().sendMessage(e.getPlayer(), ConfigValues.Message.PLACE);
                 }
             } else {
-                main.getUtils().sendMessage(e.getPlayer(), ConfigValues.Message.NO_PERMISSION_PLACE);
+                main.getUtils().sendMessage(p, ConfigValues.Message.NO_PERMISSION_PLACE);
             }
         }
     }

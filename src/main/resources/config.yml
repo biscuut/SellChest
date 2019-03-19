@@ -53,8 +53,8 @@ item:
 
 hooks:
   essentials: true # Use the worth.yml from Essentials for prices
-  shopguiplus: false # Use prices from ShopGUI+ (unfortunately, I can only get prices while the player, faction leader, or island owner is online
-  # unless if shopguiplus-workaround is enabled- where it will then get the prices from any other random online player).
+  shopguiplus: false # Use prices from ShopGUI+ (unfortunately, I can only get prices while the player, faction leader, or island owner is online due
+  # to api limitations unless if shopguiplus-workaround is enabled- where it will then get the prices from any other random online player).
   askyblock: false
   factions: true
   plotsquared: false
@@ -62,7 +62,14 @@ hooks:
 # Allow the plugin to fetch ShopGUI+ prices while the money recipient is offline.
 # This workaround will instead take the prices from any random online player. Would only recommend
 # using this if the shop prices are the same for all players in your server.
-shopguiplus-workaround: false
+shopguiplus-workaround: true
+
+# Set chest limits with permissions.
+chest-limits:
+  default: 0 # This is the default limit that everyone has. 0 means no limit.
+  vip: 5 # For example, this would mean anyone with the permission 'sellchest.limit.vip' would be able to place 5 chests only
+         # unless if the default stays 0, then they get the highest limit they have permission for: unlimited.
+  mvp: 10 # sellchest.limit.mvp
 
 # Customize messages from the plugin.
 messages:
@@ -76,6 +83,7 @@ messages:
   no-permission-place: '&cYou do not have permission to place a sellchest!'
   no-permission-command: '&cNo permission!'
   not-minimum-faction: '&cYou are not the minimum factions role!'
+  reached-limit: '&cYou reached your place limit of {limit}!'
 
 # These prices will be used as a last resort if none of the hooks above are enabled.
 prices:
@@ -87,4 +95,4 @@ prices:
 update-messages: true
 
 # Please do not change this!
-config-version: 1.0
+config-version: 1.1

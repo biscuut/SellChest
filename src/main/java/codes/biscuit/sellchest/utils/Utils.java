@@ -46,11 +46,12 @@ public class Utils {
     }
 
     public boolean isVoidChest(ItemStack item) {
-        return (item.hasItemMeta() && item.getItemMeta().getDisplayName().equals(main.getConfigValues().getChestName()) && item.getItemMeta().hasLore() && item.getItemMeta().getLore().equals(main.getConfigValues().getChestLore()));
+        return (item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().equals(main.getConfigValues().getChestName()) && item.getItemMeta().hasLore() && item.getItemMeta().getLore().equals(main.getConfigValues().getChestLore()));
     }
 
     public ItemStack getSellChestItemStack(int amount) {
-        ItemStack sellChest = new ItemStack(main.getConfigValues().getItemMaterial(), amount, main.getConfigValues().getItemDamage());
+        ItemStack sellChest = main.getConfigValues().getItem();
+        sellChest.setAmount(amount);
         ItemMeta sellChestMeta = sellChest.getItemMeta();
         sellChestMeta.setDisplayName(main.getConfigValues().getChestName());
         sellChestMeta.setLore(main.getConfigValues().getChestLore());
@@ -170,7 +171,7 @@ public class Utils {
     }
 
     public void updateConfig(SellChest main) {
-        if (main.getConfigValues().getConfigVersion() < 1.0) {
+        if (main.getConfigValues().getConfigVersion() < 1.1) {
             Map<String, Object> oldValues = new HashMap<>();
             for (String oldKey : main.getConfig().getKeys(true)) {
                 oldValues.put(oldKey, main.getConfig().get(oldKey));
@@ -182,7 +183,7 @@ public class Utils {
                     main.getConfig().set(newKey, oldValues.get(newKey));
                 }
             }
-            main.getConfig().set("config-version", 1.0);
+            main.getConfig().set("config-version", 1.1);
             main.saveConfig();
         }
     }
@@ -224,5 +225,63 @@ public class Utils {
                 }
             }
         } catch (Exception ignored) {}
+    }
+
+    List<String> colorLore(List<String> lore) {
+        for (int i = 0; i < lore.size(); i++) {
+            lore.set(i, color(lore.get(i)));
+        }
+        return lore; // For convenience
+    }
+
+    ItemStack itemFromString(String rawItem) {
+        Material material;
+        String[] rawSplit;
+        if (rawItem.contains(":")) {
+            rawSplit = rawItem.split(":");
+        } else {
+            rawSplit = new String[] {rawItem};
+        }
+        try {
+            material = Material.valueOf(rawSplit[0].toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            material = Material.DIRT;
+        }
+        short damage = 1;
+        if (rawSplit.length > 1) {
+            try {
+                damage = Short.valueOf(rawSplit[1]);
+            } catch (IllegalArgumentException ignored) {}
+        }
+        return new ItemStack(material, 1, damage);
+    }
+
+    public boolean reachedLimit(Player p) {
+        Map<String, Integer> limits = main.getConfigValues().getChestLimits();
+        int maxChests = limits.get("default");
+        if (maxChests == 0) {
+            return false;
+        }
+        for (Map.Entry<String, Integer> limit : limits.entrySet()) {
+            if (p.hasPermission("sellchest.limit."+limit.getKey())) {
+                if (limit.getValue() == 0) {
+                    return false;
+                }
+                if (limit.getValue() > maxChests) {
+                    maxChests = limit.getValue();
+                }
+            }
+        }
+        int chestCount = 0;
+        for (OfflinePlayer player : chestLocations.values()) {
+            if (player.equals(p)) {
+                chestCount++;
+            }
+        }
+        if (chestCount >= maxChests) {
+            p.sendMessage(main.getConfigValues().getReachedLimitMessage(maxChests));
+            return true;
+        }
+        return false;
     }
 }
