@@ -14,6 +14,10 @@ sell-time: 1.0
 # How often sellchest locations should save to config, in seconds (good for when crashes happen).
 save-time: 300.0
 
+# How often players should be notified of their recent earnings. This will display the amount earned since the last message.
+# For example, if the interval is 5 minutes (300s), then it will display the earnings in the past 5 minutes.
+recent-earnings-time: 300.0
+
 # Set to false if you don't want unsellable items to be cleared.
 # ex. if this is true and bedrock is found in a sellchest with a value of $0,
 # it will still be removed from the chest.
@@ -51,6 +55,9 @@ item:
     - '&7according to the shop price and straight into your balance.'
   glow: false
 
+# The title that will show up when opening the chest ingame.
+chest-title: '&6&lSellChest'
+
 hooks:
   essentials: true # Use the worth.yml from Essentials for prices
   shopguiplus: false # Use prices from ShopGUI+ (unfortunately, I can only get prices while the player, faction leader, or island owner is online due
@@ -84,6 +91,7 @@ messages:
   no-permission-command: '&cNo permission!'
   not-minimum-faction: '&cYou are not the minimum factions role!'
   reached-limit: '&cYou reached your place limit of {limit}!'
+  recently-earned: '&aYou have earned ${amount} in the past 5 minutes!'
 
 # These prices will be used as a last resort if none of the hooks above are enabled.
 prices:
@@ -95,4 +103,4 @@ prices:
 update-messages: true
 
 # Please do not change this!
-config-version: 1.1
+config-version: 1.2

@@ -28,6 +28,7 @@ public class Utils {
     private SellChest main;
     private int sellTimerID;
     private int saveTimerID;
+    private int messageTimerID;
     private Map<Location, OfflinePlayer> chestLocations = new HashMap<>();
     private Set<OfflinePlayer> bypassPlayers = new HashSet<>();
 
@@ -39,9 +40,9 @@ public class Utils {
         return ChatColor.translateAlternateColorCodes('&', text);
     }
 
-    public void sendMessage(CommandSender p, ConfigValues.Message message) {
-        if (!main.getConfigValues().getMessage(message).equals("")) {
-            p.sendMessage(main.getConfigValues().getMessage(message));
+    public void sendMessage(CommandSender p, ConfigValues.Message message, Object... variables) {
+        if (!main.getConfigValues().getMessage(message, variables).equals("")) {
+            p.sendMessage(main.getConfigValues().getMessage(message, variables));
         }
     }
 
@@ -133,6 +134,24 @@ public class Utils {
         }, main.getConfigValues().getSaveInterval(), main.getConfigValues().getSaveInterval());
     }
 
+    public int getMessageTimerID() {
+        return messageTimerID;
+    }
+
+    public void runMessageTimer() {
+        if (main.getConfigValues().getRecentEarningsInterval() > 0) {
+            messageTimerID = Bukkit.getScheduler().scheduleSyncRepeatingTask(main, () -> {
+                for (Map.Entry<OfflinePlayer, Double> entry : main.getHookUtils().getMoneyHistory().entrySet()) {
+                    if (entry.getKey().isOnline()) {
+                        Player p = entry.getKey().getPlayer();
+                        main.getUtils().sendMessage(p, ConfigValues.Message.RECENTLY_EARNED, entry.getValue());
+                    }
+                }
+                main.getHookUtils().getMoneyHistory().clear();
+            }, main.getConfigValues().getRecentEarningsInterval(), main.getConfigValues().getRecentEarningsInterval());
+        }
+    }
+
     public int getSaveTimerID() {
         return saveTimerID;
     }
@@ -171,7 +190,7 @@ public class Utils {
     }
 
     public void updateConfig(SellChest main) {
-        if (main.getConfigValues().getConfigVersion() < 1.1) {
+        if (main.getConfigValues().getConfigVersion() < 1.2) {
             Map<String, Object> oldValues = new HashMap<>();
             for (String oldKey : main.getConfig().getKeys(true)) {
                 oldValues.put(oldKey, main.getConfig().get(oldKey));
@@ -183,7 +202,7 @@ public class Utils {
                     main.getConfig().set(newKey, oldValues.get(newKey));
                 }
             }
-            main.getConfig().set("config-version", 1.1);
+            main.getConfig().set("config-version", 1.2);
             main.saveConfig();
         }
     }
@@ -279,7 +298,7 @@ public class Utils {
             }
         }
         if (chestCount >= maxChests) {
-            p.sendMessage(main.getConfigValues().getReachedLimitMessage(maxChests));
+            main.getUtils().sendMessage(p, ConfigValues.Message.REACHED_LIMIT, maxChests);
             return true;
         }
         return false;

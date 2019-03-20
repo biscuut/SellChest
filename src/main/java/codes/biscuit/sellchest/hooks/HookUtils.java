@@ -16,6 +16,7 @@ public class HookUtils {
     private SellChest main;
     private Economy economy;
     private Map<Hooks, Object> enabledHooks = new HashMap<>();
+    private Map<OfflinePlayer, Double> moneyHistory = new HashMap<>();
 
     public HookUtils(SellChest main) {
         this.main = main;
@@ -67,6 +68,9 @@ public class HookUtils {
     }
 
     public void giveMoney(OfflinePlayer p, double amount, Location loc) {
+        if (main.getConfigValues().getRecentEarningsInterval() > 0) {
+            moneyHistory.put(p, moneyHistory.getOrDefault(p, 0D) + amount);
+        }
         MoneyRecipient mr = main.getConfigValues().getMoneyRecipient();
         FactionsUUIDHook factionsUUIDHook = ((FactionsUUIDHook)enabledHooks.get(Hooks.FACTIONSUUID));
         MassiveCoreHook massiveCoreHook = ((MassiveCoreHook)enabledHooks.get(Hooks.MASSIVECOREFACTIONS));
@@ -157,6 +161,10 @@ public class HookUtils {
 
     Economy getEconomy() {
         return economy;
+    }
+
+    public Map<OfflinePlayer, Double> getMoneyHistory() {
+        return moneyHistory;
     }
 
     enum Hooks {

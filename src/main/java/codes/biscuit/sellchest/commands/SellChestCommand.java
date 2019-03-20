@@ -78,7 +78,7 @@ public class SellChestCommand implements TabExecutor {
                                         }
                                     }
                                     sender.sendMessage(Utils.color("&aGave " + p.getName() + " " + giveAmount + " sellchest(s)!"));
-                                    if (!main.getConfigValues().getMessageReceive(giveAmount).equals("")) p.sendMessage(main.getConfigValues().getMessageReceive(giveAmount));
+                                    main.getUtils().sendMessage(p, ConfigValues.Message.RECEIVED, giveAmount);
                                 } else {
                                     sender.sendMessage(Utils.color("&cThis player doesn't have an empty slot in their inventory!"));
                                 }
@@ -95,6 +95,8 @@ public class SellChestCommand implements TabExecutor {
                         main.getUtils().runSellTimer();
                         Bukkit.getScheduler().cancelTask(main.getUtils().getSaveTimerID());
                         main.getUtils().runSaveTimer();
+                        Bukkit.getScheduler().cancelTask(main.getUtils().getMessageTimerID());
+                        main.getUtils().runMessageTimer();
                         sender.sendMessage(Utils.color("&aReloaded the config! Most values have been instantly updated."));
                         break;
                     case "bypass":

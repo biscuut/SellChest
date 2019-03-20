@@ -2,6 +2,7 @@ package codes.biscuit.sellchest.events;
 
 import codes.biscuit.sellchest.SellChest;
 import codes.biscuit.sellchest.utils.ConfigValues;
+import codes.biscuit.sellchest.utils.ReflectionUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -22,6 +23,10 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Chest;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 public class PlayerEvents implements Listener {
@@ -32,6 +37,7 @@ public class PlayerEvents implements Listener {
         this.main = main;
     }
 
+    @SuppressWarnings("ConstantConditions")
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onVoidChestPlace(PlayerInteractEvent e) {
         Player p = e.getPlayer();
@@ -76,6 +82,36 @@ public class PlayerEvents implements Listener {
                         Chest chest = new Chest(main.getUtils().getOppositeDirection(p));
                         state.setData(chest);
                         state.update();
+                        try {
+                            if (ReflectionUtils.getVersion().contains("1_8") || ReflectionUtils.getVersion().contains("1_9") || ReflectionUtils.getVersion().contains("1_10") || ReflectionUtils.getVersion().contains("1_11")) {
+                                Method getTileEntity = ReflectionUtils.getMethod(state.getClass(), "getTileEntity");//newBlock.getState().getClass().getDeclaredMethod("getTileEntity");
+                                if (!getTileEntity.isAccessible()) {
+                                    getTileEntity.setAccessible(true);
+                                }
+                                Object tileEntityChest = getTileEntity.invoke(newBlock.getState());
+                                Method setDisplayName = ReflectionUtils.getMethod(tileEntityChest.getClass(), "a", String.class); //tileEntityChest.getClass().getMethod("a", String.class);
+                                setDisplayName.invoke(tileEntityChest, main.getConfigValues().getChestTitle());
+                            } else if (ReflectionUtils.getVersion().contains("1_12")) {
+                                Field tileEntity = ReflectionUtils.getField(state.getClass().getSuperclass().getSuperclass().getSuperclass(), "tileEntity");//newBlock.getState().getClass().getSuperclass().getSuperclass().getSuperclass().getDeclaredField("tileEntity");
+                                tileEntity.setAccessible(true);
+                                Object tileEntityObject = tileEntity.get(newBlock.getState());
+                                Field customName = ReflectionUtils.getField(tileEntityObject.getClass().getSuperclass(), "o");//tileEntityObject.getClass().getSuperclass().getDeclaredField("o");
+                                customName.setAccessible(true);
+                                customName.set(tileEntityObject, main.getConfigValues().getChestTitle());
+                            } else {
+                                Method getTileEntity = ReflectionUtils.getMethod(state.getClass(), "getTileEntity");//newBlock.getState().getClass().getDeclaredMethod("getTileEntity");
+                                if (!getTileEntity.isAccessible()) {
+                                    getTileEntity.setAccessible(true);
+                                }
+                                Object tileEntityChest = getTileEntity.invoke(newBlock.getState());
+                                Method setDisplayName = ReflectionUtils.getMethod(tileEntityChest.getClass(), "setCustomName", ReflectionUtils.getNMSClass("IChatBaseComponent")); //tileEntityChest.getClass().getMethod("setCustomName", ReflectionUtils.getNMSClass("IChatBaseComponent"));
+                                Constructor newChatComponentText = ReflectionUtils.getConstructor(ReflectionUtils.getNMSClass("ChatComponentText"), String.class); //ReflectionUtils.getNMSClass("ChatComponentText").getConstructor(String.class);
+                                Object chatComponentText = newChatComponentText.newInstance(main.getConfigValues().getChestTitle());
+                                setDisplayName.invoke(tileEntityChest, chatComponentText);
+                            }
+                        } catch (IllegalAccessException | InvocationTargetException | InstantiationException | NullPointerException ex) {
+                            ex.printStackTrace();
+                        }
                         Sound digSound = null;
                         try {
                             digSound = Sound.valueOf("DIG_WOOD"); // Sound for 1.8

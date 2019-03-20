@@ -19,7 +19,6 @@ public class SellChest extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        getConfig().options().copyDefaults(true);
         saveDefaultConfig();
         getCommand("sellchest").setExecutor(new SellChestCommand(this));
         configValues = new ConfigValues(this);

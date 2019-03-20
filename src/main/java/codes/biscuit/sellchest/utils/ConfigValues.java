@@ -58,10 +58,15 @@ public class ConfigValues {
         }
         main.getUtils().runSellTimer();
         main.getUtils().runSaveTimer();
+        main.getUtils().runMessageTimer();
     }
 
     String getChestName() {
         return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("item.name"));
+    }
+
+    public String getChestTitle() {
+        return ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("chest-title"));
     }
 
     long getSellInterval() {
@@ -82,18 +87,13 @@ public class ConfigValues {
         }
     }
 
+    public long getRecentEarningsInterval() {
+        return Math.round(main.getConfig().getDouble("recent-earnings-time") * 20);
+    }
+
     boolean removeUnsellableItems() {
         return main.getConfig().getBoolean("remove-unsellable-items");
     }
-
-    public String getMessageReceive(int giveAmount) {
-        return getMessage(Message.RECEIVED).replace("{amount}", String.valueOf(giveAmount));
-    }
-
-    String getReachedLimitMessage(int limit) {
-        return getMessage(Message.REACHED_LIMIT).replace("{limit}", String.valueOf(limit));
-    }
-
 
     List<String> getChestLore() {
         return main.getUtils().colorLore(main.getConfig().getStringList("item.lore"));
@@ -195,7 +195,14 @@ public class ConfigValues {
         return limits;
     }
 
-    String getMessage(Message message) {
+    String getMessage(Message message, Object... variables) {
+        if (message == Message.RECEIVED) {
+            return Utils.color(main.getConfig().getString(message.getPath()).replace("{amount}", String.valueOf(variables[0])));
+        } else if (message == Message.REACHED_LIMIT) {
+            return Utils.color(main.getConfig().getString(message.getPath()).replace("{limit}", String.valueOf(variables[0])));
+        } else if (message == Message.RECENTLY_EARNED) {
+            return Utils.color(main.getConfig().getString(message.getPath()).replace("{amount}", String.valueOf(variables[0])));
+        }
         return Utils.color(main.getConfig().getString(message.getPath()));
     }
 
@@ -210,6 +217,7 @@ public class ConfigValues {
         NO_PERMISSION_PLACE("no-permission-place"),
         NO_PERMISSION_COMMAND("no-permission-command"),
         NOT_MINIMUM_FACTION("not-minimum-faction"),
+        RECENTLY_EARNED("recently-earned"),
         REACHED_LIMIT("reached-limit");
 
         private String path;
