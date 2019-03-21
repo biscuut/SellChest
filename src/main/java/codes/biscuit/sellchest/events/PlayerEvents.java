@@ -82,6 +82,7 @@ public class PlayerEvents implements Listener {
                         Chest chest = new Chest(main.getUtils().getOppositeDirection(p));
                         state.setData(chest);
                         state.update();
+                        state = newBlock.getState();
                         try {
                             if (ReflectionUtils.getVersion().contains("1_8") || ReflectionUtils.getVersion().contains("1_9") || ReflectionUtils.getVersion().contains("1_10") || ReflectionUtils.getVersion().contains("1_11")) {
                                 Method getTileEntity = ReflectionUtils.getMethod(state.getClass(), "getTileEntity");//newBlock.getState().getClass().getDeclaredMethod("getTileEntity");
@@ -99,12 +100,10 @@ public class PlayerEvents implements Listener {
                                 customName.setAccessible(true);
                                 customName.set(tileEntityObject, main.getConfigValues().getChestTitle());
                             } else {
-                                Method getTileEntity = ReflectionUtils.getMethod(state.getClass(), "getTileEntity");//newBlock.getState().getClass().getDeclaredMethod("getTileEntity");
-                                if (!getTileEntity.isAccessible()) {
-                                    getTileEntity.setAccessible(true);
-                                }
+                                Method getTileEntity = ReflectionUtils.getMethod(state.getClass().getSuperclass().getSuperclass().getSuperclass(), "getTileEntity");//newBlock.getState().getClass().getDeclaredMethod("getTileEntity");
+                                getTileEntity.setAccessible(true);
                                 Object tileEntityChest = getTileEntity.invoke(newBlock.getState());
-                                Method setDisplayName = ReflectionUtils.getMethod(tileEntityChest.getClass(), "setCustomName", ReflectionUtils.getNMSClass("IChatBaseComponent")); //tileEntityChest.getClass().getMethod("setCustomName", ReflectionUtils.getNMSClass("IChatBaseComponent"));
+                                Method setDisplayName = ReflectionUtils.getMethod(tileEntityChest.getClass().getSuperclass(), "setCustomName", ReflectionUtils.getNMSClass("IChatBaseComponent")); //tileEntityChest.getClass().getMethod("setCustomName", ReflectionUtils.getNMSClass("IChatBaseComponent"));
                                 Constructor newChatComponentText = ReflectionUtils.getConstructor(ReflectionUtils.getNMSClass("ChatComponentText"), String.class); //ReflectionUtils.getNMSClass("ChatComponentText").getConstructor(String.class);
                                 Object chatComponentText = newChatComponentText.newInstance(main.getConfigValues().getChestTitle());
                                 setDisplayName.invoke(tileEntityChest, chatComponentText);

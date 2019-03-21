@@ -15,7 +15,7 @@ sell-time: 1.0
 save-time: 300.0
 
 # How often players should be notified of their recent earnings. This will display the amount earned since the last message.
-# For example, if the interval is 5 minutes (300s), then it will display the earnings in the past 5 minutes.
+# For example, if the interval is 5 minutes (300s), then it will display the earnings in the past 5 minutes. Set to 0 to disable.
 recent-earnings-time: 300.0
 
 # Set to false if you don't want unsellable items to be cleared.
