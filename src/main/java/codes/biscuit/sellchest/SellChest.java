@@ -4,6 +4,7 @@ import codes.biscuit.sellchest.commands.SellChestCommand;
 import codes.biscuit.sellchest.events.OtherEvents;
 import codes.biscuit.sellchest.events.PlayerEvents;
 import codes.biscuit.sellchest.hooks.HookUtils;
+import codes.biscuit.sellchest.hooks.MetricsLite;
 import codes.biscuit.sellchest.utils.ConfigValues;
 import codes.biscuit.sellchest.utils.Utils;
 import org.bukkit.Bukkit;
@@ -28,6 +29,7 @@ public class SellChest extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerEvents(this), this);
         Bukkit.getPluginManager().registerEvents(new OtherEvents(this), this);
         configValues.setupSellChests();
+        new MetricsLite(this);
     }
 
     @Override

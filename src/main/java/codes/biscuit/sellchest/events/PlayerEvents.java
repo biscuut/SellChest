@@ -27,7 +27,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.EnumSet;
 import java.util.Map;
+import java.util.Set;
 
 public class PlayerEvents implements Listener {
 
@@ -48,22 +50,25 @@ public class PlayerEvents implements Listener {
                     if (bypassing || !main.getUtils().reachedLimit(p)) {
                         e.setCancelled(true);
                         Block newBlock;
-                        Material longGrass = null;
+                        Set<Material> placeOver = EnumSet.of(Material.AIR, Material.SNOW, Material.LAVA, Material.WATER);
                         try {
-                            longGrass = Material.valueOf("LONG_GRASS");
+                            placeOver.add(Material.valueOf("LONG_GRASS"));
                         } catch (IllegalArgumentException ex) {
                             try {
-                                longGrass = Material.valueOf("TALL_GRASS");
-                            } catch (IllegalArgumentException ignored) {
-                            }
+                                placeOver.add(Material.valueOf("TALL_GRASS"));
+                            } catch (IllegalArgumentException ignored) {}
                         }
+                        try {
+                            placeOver.add(Material.valueOf("STATIONARY_WATER"));
+                            placeOver.add(Material.valueOf("STATIONARY_LAVA"));
+                        } catch (IllegalArgumentException ignored) {}
                         if (e.getClickedBlock().getState() instanceof InventoryHolder && !p.isSneaking()) {
                             return;
-                        } else if (e.getClickedBlock().getType().equals(longGrass)) {
+                        } else if (placeOver.contains(e.getClickedBlock().getType())) {
                             newBlock = e.getClickedBlock(); // Blocks place directly on grass
                         } else {
                             newBlock = e.getClickedBlock().getRelative(e.getBlockFace());
-                            if (!newBlock.getType().equals(Material.AIR)) { // For hackers
+                            if (!newBlock.getType().equals(Material.AIR)) { // For hackers/glitched block placement
                                 return;
                             }
                         }
