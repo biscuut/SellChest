@@ -32,7 +32,7 @@ public class Utils {
     private int sellTimerID;
     private int saveTimerID;
     private int messageTimerID;
-    private Map<Location, OfflinePlayer> chestLocations = new HashMap<>();
+    private Map<Location, UUID> chestLocations = new HashMap<>();
     private Set<OfflinePlayer> bypassPlayers = new HashSet<>();
 
     public Utils(SellChest main) {
@@ -64,39 +64,12 @@ public class Utils {
         return sellChest;
     }
 
-    public void addConfigLocation(Location loc, OfflinePlayer offlineP) {
-        chestLocations.put(loc, offlineP);
-        String serializedLoc = loc.getWorld().getName() + "|" + loc.getBlockX() + "|" + loc.getBlockY() + "|" + loc.getBlockZ();
-        String uuid = offlineP.getUniqueId().toString();
-        List<String> locationList;
-        if (main.getConfigValues().getLocationsConfig().isSet("locations." + uuid)) {
-            locationList = main.getConfigValues().getLocationsConfig().getStringList("locations." + uuid);
-        } else {
-            locationList = new ArrayList<>();
-        }
-        locationList.add(serializedLoc);
-        main.getConfigValues().getLocationsConfig().set("locations." + uuid, locationList);
-    }
-
-    public void removeConfigLocation(Location loc, OfflinePlayer offlineP) {
-        chestLocations.remove(loc);
-        String serializedLoc = loc.getWorld().getName() + "|" + loc.getBlockX() + "|" + loc.getBlockY() + "|" + loc.getBlockZ();
-        String uuid = offlineP.getUniqueId().toString();
-        List<String> locationList = main.getConfigValues().getLocationsConfig().getStringList("locations." + uuid);
-        locationList.remove(serializedLoc);
-        if (locationList.isEmpty()) {
-            main.getConfigValues().getLocationsConfig().set("locations." + uuid, null);
-        } else {
-            main.getConfigValues().getLocationsConfig().set("locations." + uuid, locationList);
-        }
-    }
-
     public void runSellTimer() {
         sellTimerID = Bukkit.getScheduler().scheduleSyncRepeatingTask(main, () -> {
-            for (Map.Entry<Location, OfflinePlayer> locationEntry : chestLocations.entrySet()) {
-                OfflinePlayer offlineP = locationEntry.getValue();
+            for (Map.Entry<Location, UUID> locationEntry : chestLocations.entrySet()) {
+                OfflinePlayer offlineP = main.getServer().getOfflinePlayer(locationEntry.getValue());
                 Location loc = locationEntry.getKey();
-                if (loc.getBlock().getType().equals(Material.CHEST)) {
+                if (loc.getBlock().getType() == Material.CHEST) {
                     Chest voidChest = (Chest)loc.getBlock().getState();
                     Inventory voidChestInventory = voidChest.getInventory();
                     for (ItemStack item : voidChestInventory) {
@@ -118,6 +91,8 @@ public class Utils {
                     if (main.getConfigValues().removeUnsellableItems()) {
                         voidChest.getBlockInventory().clear();
                     }
+                } else {
+                    chestLocations.remove(loc);
                 }
             }
         }, main.getConfigValues().getSellInterval(), main.getConfigValues().getSellInterval());
@@ -128,13 +103,26 @@ public class Utils {
     }
 
     public void runSaveTimer() {
-        saveTimerID = Bukkit.getScheduler().scheduleSyncRepeatingTask(main, () -> {
-            try {
-                main.getConfigValues().getLocationsConfig().save(main.getConfigValues().getLocationsFile());
-            } catch (IOException ex) {
-                ex.printStackTrace();
+        saveTimerID = Bukkit.getScheduler().scheduleSyncRepeatingTask(main, this::saveChestLocations, main.getConfigValues().getSaveInterval(), main.getConfigValues().getSaveInterval());
+    }
+
+    public void saveChestLocations() {
+        try {
+            for (Map.Entry<Location, UUID> entry : chestLocations.entrySet()) {
+                Location loc = entry.getKey();
+                UUID uuid = entry.getValue();
+                String serializedLoc = loc.getWorld().getName() + "|" + loc.getBlockX() + "|" + loc.getBlockY() + "|" + loc.getBlockZ();
+                String uuidString = uuid.toString();
+                List<String> locationList = main.getConfigValues().getLocationsConfig().getStringList("locations." + uuidString);
+                locationList.add(serializedLoc);
+                main.getConfigValues().getLocationsConfig().set("locations." + uuidString, locationList);
             }
-        }, main.getConfigValues().getSaveInterval(), main.getConfigValues().getSaveInterval());
+            main.getConfigValues().getLocationsConfig().save(main.getConfigValues().getLocationsFile());
+            main.getConfigValues().getLocationsConfig().set("locations", null);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            main.getLogger().info("Unable to save sellchest locations!");
+        }
     }
 
     public int getMessageTimerID() {
@@ -166,7 +154,7 @@ public class Utils {
         item.setItemMeta(meta);
     }
 
-    public Map<Location, OfflinePlayer> getChestLocations() {
+    public Map<Location, UUID> getChestLocations() {
         return this.chestLocations;
     }
 
@@ -193,7 +181,7 @@ public class Utils {
     }
 
     public void updateConfig(SellChest main) {
-        if (main.getConfigValues().getConfigVersion() < 1.2) {
+        if (main.getConfigValues().getConfigVersion() < 1.3) {
             Map<String, Object> oldValues = new HashMap<>();
             for (String oldKey : main.getConfig().getKeys(true)) {
                 oldValues.put(oldKey, main.getConfig().get(oldKey));
@@ -205,7 +193,7 @@ public class Utils {
                     main.getConfig().set(newKey, oldValues.get(newKey));
                 }
             }
-            main.getConfig().set("config-version", 1.2);
+            main.getConfig().set("config-version", 1.3);
             main.saveConfig();
         }
     }
@@ -295,8 +283,8 @@ public class Utils {
             }
         }
         int chestCount = 0;
-        for (OfflinePlayer player : chestLocations.values()) {
-            if (player.equals(p)) {
+        for (UUID uuid : chestLocations.values()) {
+            if (uuid.equals(p.getUniqueId())) {
                 chestCount++;
             }
         }

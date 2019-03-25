@@ -1,4 +1,4 @@
-package codes.biscuit.sellchest.events;
+package codes.biscuit.sellchest.listeners;
 
 import codes.biscuit.sellchest.SellChest;
 import codes.biscuit.sellchest.utils.ConfigValues;
@@ -13,10 +13,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockDamageEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.*;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.InventoryHolder;
@@ -27,15 +25,16 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 
-public class PlayerEvents implements Listener {
+public class PlayerListener implements Listener {
 
     private SellChest main;
 
-    public PlayerEvents(SellChest main) {
+    public PlayerListener(SellChest main) {
         this.main = main;
     }
 
@@ -132,7 +131,7 @@ public class PlayerEvents implements Listener {
                             removeItem.setAmount(e.getItem().getAmount() - 1);
                             p.setItemInHand(removeItem);
                         }
-                        main.getUtils().addConfigLocation(newBlock.getLocation(), e.getPlayer());
+                        main.getUtils().getChestLocations().put(newBlock.getLocation(), e.getPlayer().getUniqueId());
                         main.getUtils().sendMessage(p, ConfigValues.Message.PLACE);
                     } else {
                         e.setCancelled(true);
@@ -200,7 +199,6 @@ public class PlayerEvents implements Listener {
                     }
                     main.getUtils().getChestLocations().remove(b.getLocation());
                     b.setType(Material.AIR);
-                    main.getUtils().removeConfigLocation(b.getLocation(), p);
                     Map excessItems = p.getInventory().addItem(main.getUtils().getSellChestItemStack(1));
                     for (Object excessItem : excessItems.values()) {
                         int itemCount = ((ItemStack) excessItem).getAmount();
@@ -217,7 +215,6 @@ public class PlayerEvents implements Listener {
                 } else {
                     main.getUtils().getChestLocations().remove(b.getLocation());
                     b.setType(Material.AIR);
-                    main.getUtils().removeConfigLocation(b.getLocation(), p);
                     p.getWorld().dropItemNaturally(b.getLocation(), main.getUtils().getSellChestItemStack(1));
                 }
                 main.getUtils().sendMessage(p, ConfigValues.Message.REMOVED);
@@ -233,6 +230,38 @@ public class PlayerEvents implements Listener {
     public void onJoin(PlayerJoinEvent e) {
         if (main.getConfigValues().sendUpdateMessages() && e.getPlayer().isOp()) {
             main.getUtils().checkUpdates(e.getPlayer());
+        }
+    }
+
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onVoidChestEntityExplosion(EntityExplodeEvent e) {
+        if (main.getConfigValues().unbreakableNaturally()) {
+            for (Block block : new ArrayList<>(e.blockList())) {
+                if (main.getUtils().getChestLocations().containsKey(block.getLocation())) {
+                    e.blockList().remove(block);
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onVoidChestBlockExplosion(BlockExplodeEvent e) {
+        if (main.getConfigValues().unbreakableNaturally()) {
+            for (Block block : new ArrayList<>(e.blockList())) {
+                if (main.getUtils().getChestLocations().containsKey(block.getLocation())) {
+                    e.blockList().remove(block);
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onVoidChestBurn(BlockBurnEvent e) {
+        if (main.getConfigValues().unbreakableNaturally()) {
+            if (main.getUtils().getChestLocations().containsKey(e.getBlock().getLocation())) {
+                e.setCancelled(true);
+            }
         }
     }
 }

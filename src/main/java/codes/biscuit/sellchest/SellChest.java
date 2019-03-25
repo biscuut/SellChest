@@ -1,16 +1,13 @@
 package codes.biscuit.sellchest;
 
 import codes.biscuit.sellchest.commands.SellChestCommand;
-import codes.biscuit.sellchest.events.OtherEvents;
-import codes.biscuit.sellchest.events.PlayerEvents;
 import codes.biscuit.sellchest.hooks.HookUtils;
 import codes.biscuit.sellchest.hooks.MetricsLite;
+import codes.biscuit.sellchest.listeners.PlayerListener;
 import codes.biscuit.sellchest.utils.ConfigValues;
 import codes.biscuit.sellchest.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.IOException;
 
 public class SellChest extends JavaPlugin {
 
@@ -26,21 +23,15 @@ public class SellChest extends JavaPlugin {
         utils = new Utils(this);
         utils.updateConfig(this);
         hookUtils =  new HookUtils(this);
-        Bukkit.getPluginManager().registerEvents(new PlayerEvents(this), this);
-        Bukkit.getPluginManager().registerEvents(new OtherEvents(this), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerListener(this), this);
         configValues.setupSellChests();
         new MetricsLite(this);
     }
 
     @Override
     public void onDisable() {
-        try {
-            configValues.getLocationsConfig().save(configValues.getLocationsFile());
-            getLogger().info("Saved sellchest locations!");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            getLogger().info("Unable to save sellchest locations!");
-        }
+        getLogger().info("Saved sellchest locations!");
+        utils.saveChestLocations();
     }
 
     public ConfigValues getConfigValues() {

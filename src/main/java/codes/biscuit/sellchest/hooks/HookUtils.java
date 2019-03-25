@@ -152,7 +152,7 @@ public class HookUtils {
                 return plotSquaredHook.plotIsSame(loc, p);
             }
         }
-        return main.getUtils().getChestLocations().get(loc).equals(p); //TODO Check uuids if thid doesnt work
+        return main.getUtils().getChestLocations().get(loc).equals(p.getUniqueId());
     }
 
     private void addPlayerMoney(OfflinePlayer p, double amount) {

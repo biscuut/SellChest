@@ -44,7 +44,6 @@ public class ConfigValues {
             locationsConfig = YamlConfiguration.loadConfiguration(this.locationsFile);
             for (String key : locationsConfig.getConfigurationSection("locations").getKeys(false)) {
                 UUID uuid = UUID.fromString(key);
-                OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
                 for (String location : locationsConfig.getStringList("locations." + key)) {
                     String[] splitLocation = location.split(Pattern.quote("|"));
                     World world = Bukkit.getWorld(splitLocation[0]);
@@ -52,7 +51,7 @@ public class ConfigValues {
                     double y = Double.parseDouble(splitLocation[2]);
                     double z = Double.parseDouble(splitLocation[3]);
                     Location loc = new Location(world, Location.locToBlock(x), Location.locToBlock(y), Location.locToBlock(z));
-                    main.getUtils().getChestLocations().put(loc, p);
+                    main.getUtils().getChestLocations().put(loc, uuid);
                 }
             }
         }
@@ -99,11 +98,11 @@ public class ConfigValues {
         return main.getUtils().colorLore(main.getConfig().getStringList("item.lore"));
     }
 
-    public YamlConfiguration getLocationsConfig() {
+    YamlConfiguration getLocationsConfig() {
         return this.locationsConfig;
     }
 
-    public File getLocationsFile() {
+    File getLocationsFile() {
         return this.locationsFile;
     }
 
@@ -182,6 +181,10 @@ public class ConfigValues {
 
     public boolean sendUpdateMessages() {
         return main.getConfig().getBoolean("update-messages");
+    }
+
+    public boolean unbreakableNaturally() {
+        return main.getConfig().getBoolean("unbreakable-naturally");
     }
 
     Map<String, Integer> getChestLimits() {
