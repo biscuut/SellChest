@@ -42,16 +42,18 @@ public class ConfigValues {
             main.getLogger().info("Files not found, generated configs!");
         } else {
             locationsConfig = YamlConfiguration.loadConfiguration(this.locationsFile);
-            for (String key : locationsConfig.getConfigurationSection("locations").getKeys(false)) {
-                UUID uuid = UUID.fromString(key);
-                for (String location : locationsConfig.getStringList("locations." + key)) {
-                    String[] splitLocation = location.split(Pattern.quote("|"));
-                    World world = Bukkit.getWorld(splitLocation[0]);
-                    double x = Double.parseDouble(splitLocation[1]);
-                    double y = Double.parseDouble(splitLocation[2]);
-                    double z = Double.parseDouble(splitLocation[3]);
-                    Location loc = new Location(world, Location.locToBlock(x), Location.locToBlock(y), Location.locToBlock(z));
-                    main.getUtils().getChestLocations().put(loc, uuid);
+            if (locationsConfig.getConfigurationSection("locations") != null) {
+                for (String key : locationsConfig.getConfigurationSection("locations").getKeys(false)) {
+                    UUID uuid = UUID.fromString(key);
+                    for (String location : locationsConfig.getStringList("locations." + key)) {
+                        String[] splitLocation = location.split(Pattern.quote("|"));
+                        World world = Bukkit.getWorld(splitLocation[0]);
+                        double x = Double.parseDouble(splitLocation[1]);
+                        double y = Double.parseDouble(splitLocation[2]);
+                        double z = Double.parseDouble(splitLocation[3]);
+                        Location loc = new Location(world, Location.locToBlock(x), Location.locToBlock(y), Location.locToBlock(z));
+                        main.getUtils().getChestLocations().put(loc, uuid);
+                    }
                 }
             }
         }

@@ -66,7 +66,9 @@ public class Utils {
 
     public void runSellTimer() {
         sellTimerID = Bukkit.getScheduler().scheduleSyncRepeatingTask(main, () -> {
-            for (Map.Entry<Location, UUID> locationEntry : chestLocations.entrySet()) {
+            Iterator<Map.Entry<Location, UUID>> entryIterator = chestLocations.entrySet().iterator();
+            while (entryIterator.hasNext()) {
+                Map.Entry<Location, UUID> locationEntry = entryIterator.next();
                 OfflinePlayer offlineP = main.getServer().getOfflinePlayer(locationEntry.getValue());
                 Location loc = locationEntry.getKey();
                 if (loc.getBlock().getType() == Material.CHEST) {
@@ -92,7 +94,7 @@ public class Utils {
                         voidChest.getBlockInventory().clear();
                     }
                 } else {
-                    chestLocations.remove(loc);
+                    entryIterator.remove();
                 }
             }
         }, main.getConfigValues().getSellInterval(), main.getConfigValues().getSellInterval());
