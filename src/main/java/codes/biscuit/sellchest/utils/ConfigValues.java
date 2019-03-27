@@ -55,6 +55,7 @@ public class ConfigValues {
                         main.getUtils().getChestLocations().put(loc, uuid);
                     }
                 }
+                locationsConfig.set("locations", null);
             }
         }
         main.getUtils().runSellTimer();
