@@ -6,6 +6,7 @@ import codes.biscuit.sellchest.utils.ReflectionUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -103,7 +104,7 @@ public class PlayerListener implements Listener {
                                 Field customName = ReflectionUtils.getField(tileEntityObject.getClass().getSuperclass(), "o");//tileEntityObject.getClass().getSuperclass().getDeclaredField("o");
                                 customName.setAccessible(true);
                                 customName.set(tileEntityObject, main.getConfigValues().getChestTitle());
-                            } else {
+                            } else if (ReflectionUtils.getVersion().contains("1_13")) {
                                 Method getTileEntity = ReflectionUtils.getMethod(state.getClass().getSuperclass().getSuperclass().getSuperclass(), "getTileEntity");//newBlock.getState().getClass().getDeclaredMethod("getTileEntity");
                                 getTileEntity.setAccessible(true);
                                 Object tileEntityChest = getTileEntity.invoke(newBlock.getState());
@@ -111,8 +112,21 @@ public class PlayerListener implements Listener {
                                 Constructor newChatComponentText = ReflectionUtils.getConstructor(ReflectionUtils.getNMSClass("ChatComponentText"), String.class); //ReflectionUtils.getNMSClass("ChatComponentText").getConstructor(String.class);
                                 Object chatComponentText = newChatComponentText.newInstance(main.getConfigValues().getChestTitle());
                                 setDisplayName.invoke(tileEntityChest, chatComponentText);
+                            } else if (ReflectionUtils.getVersion().contains("1_14")) {
+                                World world = newBlock.getWorld();
+                                Method getWorldHandle = ReflectionUtils.getMethod(world.getClass(), "getHandle");
+                                Object nmsWorld = getWorldHandle.invoke(world);
+                                Method getTileEntity = ReflectionUtils.getMethod(nmsWorld.getClass().getSuperclass(), "getTileEntity", ReflectionUtils.getNMSClass("BlockPosition"));
+                                getTileEntity.setAccessible(true);
+                                Method getPosition = ReflectionUtils.getMethod(newBlock.getClass(), "getPosition");
+                                Object blockPos = getPosition.invoke(newBlock);
+                                Object tileEntityChest = getTileEntity.invoke(nmsWorld, blockPos);
+                                Field customName = ReflectionUtils.getField(tileEntityChest.getClass().getSuperclass().getSuperclass(), "customName");
+                                Constructor newChatComponentText = ReflectionUtils.getConstructor(ReflectionUtils.getNMSClass("ChatComponentText"), String.class); //ReflectionUtils.getNMSClass("ChatComponentText").getConstructor(String.class);
+                                Object chatComponentText = newChatComponentText.newInstance(main.getConfigValues().getChestTitle());
+                                customName.set(tileEntityChest, chatComponentText);
                             }
-                        } catch (IllegalAccessException | InvocationTargetException | InstantiationException | NullPointerException ex) {
+                        } catch (IllegalAccessException | InvocationTargetException | NullPointerException | InstantiationException ex) {
                             ex.printStackTrace();
                         }
                         Sound digSound = null;

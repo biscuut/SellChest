@@ -156,7 +156,9 @@ public class HookUtils {
     }
 
     private void addPlayerMoney(OfflinePlayer p, double amount) {
-        economy.depositPlayer(p, amount);
+        if (economy.hasAccount(p)) {
+            economy.depositPlayer(p, amount);
+        }
     }
 
     Economy getEconomy() {
