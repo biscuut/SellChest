@@ -44,7 +44,7 @@ public class PlayerListener implements Listener {
     public void onVoidChestPlace(PlayerInteractEvent e) {
         Player p = e.getPlayer();
         boolean bypassing = main.getUtils().getBypassPlayers().contains(p);
-        if (!e.isCancelled() || bypassing) {
+        if (!main.getHookUtils().isCancelled(e) || bypassing) {
             if (p.hasPermission("sellchest.place") || bypassing) {
                 if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && e.getItem() != null && main.getUtils().isVoidChest(e.getItem())) {
                     if (bypassing || !main.getUtils().reachedLimit(p)) {

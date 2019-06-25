@@ -207,7 +207,7 @@ public class ConfigValues {
         } else if (message == Message.REACHED_LIMIT) {
             return Utils.color(main.getConfig().getString(message.getPath()).replace("{limit}", String.valueOf(variables[0])));
         } else if (message == Message.RECENTLY_EARNED) {
-            return Utils.color(main.getConfig().getString(message.getPath()).replace("{amount}", String.valueOf(variables[0])));
+            return Utils.color(main.getConfig().getString(message.getPath()).replace("{amount}", String.format("%.2f", (double)variables[0]))); // should fix scientific notations?
         }
         return Utils.color(main.getConfig().getString(message.getPath()));
     }

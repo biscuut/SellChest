@@ -5,47 +5,19 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>codes.biscuit</groupId>
-    <artifactId>SellChest</artifactId>
-    <version>1.1.0</version>
-    <packaging>jar</packaging>
+    <artifactId>SellChestParent</artifactId>
+    <version>parent</version>
+    <modules>
+        <module>Abstraction</module>
+        <module>SellChestPlugin</module>
+        <module>MC_1_14</module>
+    </modules>
+    <packaging>pom</packaging>
 
     <name>SellChest</name>
 
     <description>Automatically sells all chest contents.</description>
     <url>https://www.spigotmc.org/resources/</url>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <archive>
-                        <addMavenDescriptor>false</addMavenDescriptor>
-                        <manifestEntries>
-                            <Built-By>Biscut</Built-By>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
-            </plugin>
-        </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-    </build>
 
     <repositories>
         <repository>
@@ -66,75 +38,4 @@
             <url>http://dl.bintray.com/tastybento/maven-repo</url>
         </repository>
     </repositories>
-
-    <dependencies>
-        <!--<dependency>-->
-            <!--<groupId>org.spigotmc</groupId>-->
-            <!--<artifactId>spigot-api</artifactId>-->
-            <!--<version>1.14.1-R0.1-SNAPSHOT</version>-->
-            <!--<scope>provided</scope>-->
-        <!--</dependency>-->
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.8.8-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.spigotmc</groupId>-->
-            <!--<artifactId>spigot</artifactId>-->
-            <!--<version>1.14.1-R0.1-SNAPSHOT</version>-->
-            <!--<scope>provided</scope>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.spigotmc</groupId>-->
-            <!--<artifactId>paperspigot</artifactId>-->
-            <!--<version>1.8.8</version>-->
-            <!--<scope>provided</scope>-->
-        <!--</dependency>-->
-        <dependency>
-            <groupId>net.milkbowl.vault</groupId>
-            <artifactId>VaultAPI</artifactId>
-            <version>1.6</version>
-        </dependency>
-        <dependency>
-            <groupId>net.brcdev</groupId>
-            <artifactId>ShopGUIPlus</artifactId>
-            <version>1.19.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.ess3</groupId>
-            <artifactId>Essentials</artifactId>
-            <version>Pre2.14.1.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.massivecraft</groupId>
-            <artifactId>savage-factions</artifactId>
-            <version>1.4-BETA-6</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.massivecraft.factions</groupId>
-            <artifactId>Factions</artifactId>
-            <version>2.14.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.massivecraft.massivecore</groupId>
-            <artifactId>MassiveCore</artifactId>
-            <version>2.14.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.wasteofplastic</groupId>
-            <artifactId>askyblock</artifactId>
-            <version>3.0.9.4</version>
-        </dependency>
-        <dependency>
-            <groupId>com.plotsquared</groupId>
-            <artifactId>PlotSquared</artifactId>
-            <version>19.02.21</version>
-        </dependency>
-    </dependencies>
 </project>

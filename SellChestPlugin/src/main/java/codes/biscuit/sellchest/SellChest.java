@@ -9,11 +9,14 @@ import codes.biscuit.sellchest.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.regex.Pattern;
+
 public class SellChest extends JavaPlugin {
 
     private ConfigValues configValues;
     private Utils utils;
     private HookUtils hookUtils;
+    private int minecraftVersion = -1;
 
     @Override
     public void onEnable() {
@@ -26,6 +29,9 @@ public class SellChest extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerListener(this), this);
         configValues.setupSellChests();
         new MetricsLite(this);
+        if (minecraftVersion == -1) {
+            minecraftVersion = Integer.valueOf(Bukkit.getBukkitVersion().split(Pattern.quote("-"))[0].split(Pattern.quote("."))[1]);
+        }
     }
 
     @Override
@@ -44,5 +50,9 @@ public class SellChest extends JavaPlugin {
 
     public HookUtils getHookUtils() {
         return hookUtils;
+    }
+
+    public int getMinecraftVersion() {
+        return minecraftVersion;
     }
 }

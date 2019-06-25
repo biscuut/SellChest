@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.command.CommandSender;
@@ -71,8 +72,16 @@ public class Utils {
                 Map.Entry<Location, UUID> locationEntry = entryIterator.next();
                 OfflinePlayer offlineP = main.getServer().getOfflinePlayer(locationEntry.getValue());
                 Location loc = locationEntry.getKey();
-                if (loc.getBlock().getType() == Material.CHEST) {
-                    Chest voidChest = (Chest)loc.getBlock().getState();
+                if (loc == null) {
+                    entryIterator.remove();
+                    continue;
+                }
+                Block block = loc.getBlock();
+                if (block == null) {
+                    continue;
+                }
+                if (block.getType() == Material.CHEST) {
+                    Chest voidChest = (Chest)block.getState();
                     Inventory voidChestInventory = voidChest.getInventory();
                     for (ItemStack item : voidChestInventory) {
                         if (item != null) {
@@ -86,7 +95,7 @@ public class Utils {
                             if (sellPrice > 0) {
                                 main.getHookUtils().giveMoney(offlineP, sellPrice, loc);
                                 voidChestInventory.setItem(voidChestInventory.first(item), new ItemStack(Material.AIR));
-                                loc.getBlock().getState().update(); // If you don't update the chest after removing, double chests will sell double
+                                block.getState().update(); // If you don't update the chest after removing, double chests will sell double
                             }
                         }
                     }

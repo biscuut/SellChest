@@ -1,10 +1,13 @@
 package codes.biscuit.sellchest.hooks;
 
 import codes.biscuit.sellchest.SellChest;
+import com.sun.org.apache.regexp.internal.RE;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 
@@ -46,12 +49,15 @@ public class HookUtils {
             main.getLogger().info("Hooked into PlotSquared");
             enabledHooks.put(Hooks.PLOTSQUARED, new PlotSquaredHook());
         }
+        if (main.getMinecraftVersion() >= 14) {
+            enabledHooks.put(Hooks.MINECRAFT_1_14, new Minecraft_1_14());
+        }
     }
 
     public double getValue(ItemStack sellItem, Player p) {
-        if (main.getConfigValues().essentialsHookEnabled()) {
+        if (main.getConfigValues().essentialsHookEnabled() && enabledHooks.containsKey(Hooks.ESSENTIALS)) {
             return ((EssentialsHook)enabledHooks.get(Hooks.ESSENTIALS)).getSellPrice(sellItem);
-        } else if (main.getConfigValues().shopGUIPlusHookEnabled()) {
+        } else if (main.getConfigValues().shopGUIPlusHookEnabled() && enabledHooks.containsKey(Hooks.SHOPGUIPLUS)) {
             if (p == null) {
                 if (main.getConfigValues().workaroundEnabled()) {
                     p = main.getServer().getOnlinePlayers().stream().findAny().orElse(null);
@@ -65,6 +71,15 @@ public class HookUtils {
         }
         String itemString = sellItem.getType().toString().toLowerCase();
         return main.getConfigValues().getConfigPrice(itemString) * sellItem.getAmount();
+    }
+
+    public boolean isCancelled(PlayerInteractEvent e) {
+        if (enabledHooks.containsKey(Hooks.MINECRAFT_1_14)) {
+            Minecraft_1_14 minecraftHook = ((Minecraft_1_14)enabledHooks.get(Hooks.MINECRAFT_1_14));
+            return minecraftHook.isCancelled(e);
+        } else {
+            return e.isCancelled();
+        }
     }
 
     public void giveMoney(OfflinePlayer p, double amount, Location loc) {
@@ -175,7 +190,8 @@ public class HookUtils {
         ESSENTIALS,
         SHOPGUIPLUS,
         ASKYBLOCK,
-        PLOTSQUARED
+        PLOTSQUARED,
+        MINECRAFT_1_14
     }
 
     public enum MoneyRecipient {

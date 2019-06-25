@@ -9,7 +9,7 @@
 ###############################################
 
 # How often sellchests should sell their contents, in seconds.
-sell-time: 1.0
+sell-time: 3.0
 
 # How often sellchest locations should save to config, in seconds (good for when crashes happen).
 save-time: 300.0
