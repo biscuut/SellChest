@@ -22,6 +22,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
@@ -146,7 +148,7 @@ public class Utils {
                 for (Map.Entry<OfflinePlayer, Double> entry : main.getHookUtils().getMoneyHistory().entrySet()) {
                     if (entry.getKey().isOnline()) {
                         Player p = entry.getKey().getPlayer();
-                        main.getUtils().sendMessage(p, ConfigValues.Message.RECENTLY_EARNED, entry.getValue());
+                        main.getUtils().sendMessage(p, ConfigValues.Message.RECENTLY_EARNED, round(entry.getValue()));
                     }
                 }
                 main.getHookUtils().getMoneyHistory().clear();
@@ -192,7 +194,7 @@ public class Utils {
     }
 
     public void updateConfig(SellChest main) {
-        if (main.getConfigValues().getConfigVersion() < 1.3) {
+        if (main.getConfigValues().getConfigVersion() < 1.4) {
             Map<String, Object> oldValues = new HashMap<>();
             for (String oldKey : main.getConfig().getKeys(true)) {
                 oldValues.put(oldKey, main.getConfig().get(oldKey));
@@ -204,7 +206,7 @@ public class Utils {
                     main.getConfig().set(newKey, oldValues.get(newKey));
                 }
             }
-            main.getConfig().set("config-version", 1.3);
+            main.getConfig().set("config-version", 1.4);
             main.saveConfig();
         }
     }
@@ -304,5 +306,11 @@ public class Utils {
             return true;
         }
         return false;
+    }
+
+    private double round(double value) {
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 }

@@ -49,14 +49,20 @@ public class HookUtils {
             main.getLogger().info("Hooked into PlotSquared");
             enabledHooks.put(Hooks.PLOTSQUARED, new PlotSquaredHook());
         }
-        if (main.getMinecraftVersion() >= 14) {
+        if (pm.getPlugin("CMI") != null) {
+            main.getLogger().info("Hooked into CMI");
+            enabledHooks.put(Hooks.CMI, new CMIHook());
+        }
+            if (main.getMinecraftVersion() >= 14) {
             enabledHooks.put(Hooks.MINECRAFT_1_14, new Minecraft_1_14());
         }
     }
 
     public double getValue(ItemStack sellItem, Player p) {
         if (main.getConfigValues().essentialsHookEnabled() && enabledHooks.containsKey(Hooks.ESSENTIALS)) {
-            return ((EssentialsHook)enabledHooks.get(Hooks.ESSENTIALS)).getSellPrice(sellItem);
+            return ((EssentialsHook) enabledHooks.get(Hooks.ESSENTIALS)).getSellPrice(sellItem);
+        } else if (main.getConfigValues().cmiHookEnabled() && enabledHooks.containsKey(Hooks.CMI)) {
+            return ((CMIHook)enabledHooks.get(Hooks.CMI)).getSellPrice(sellItem);
         } else if (main.getConfigValues().shopGUIPlusHookEnabled() && enabledHooks.containsKey(Hooks.SHOPGUIPLUS)) {
             if (p == null) {
                 if (main.getConfigValues().workaroundEnabled()) {
@@ -191,7 +197,8 @@ public class HookUtils {
         SHOPGUIPLUS,
         ASKYBLOCK,
         PLOTSQUARED,
-        MINECRAFT_1_14
+        MINECRAFT_1_14,
+        CMI
     }
 
     public enum MoneyRecipient {

@@ -68,6 +68,7 @@ hooks:
   askyblock: false
   factions: true
   plotsquared: false
+  cmi: false
 
 # Allow the plugin to fetch ShopGUI+ prices while the money recipient is offline.
 # This workaround will instead take the prices from any random online player. Would only recommend
@@ -106,4 +107,4 @@ prices:
 update-messages: true
 
 # Please do not change this!
-config-version: 1.3
+config-version: 1.4

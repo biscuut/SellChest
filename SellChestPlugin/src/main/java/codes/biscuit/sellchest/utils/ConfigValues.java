@@ -121,6 +121,10 @@ public class ConfigValues {
         return main.getConfig().getBoolean("hooks.essentials");
     }
 
+    public boolean cmiHookEnabled() {
+        return main.getConfig().getBoolean("hooks.cmi");
+    }
+
     public boolean shopGUIPlusHookEnabled() {
         return main.getConfig().getBoolean("hooks.shopguiplus");
     }

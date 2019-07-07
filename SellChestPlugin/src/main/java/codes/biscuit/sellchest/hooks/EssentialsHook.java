@@ -20,6 +20,7 @@ class EssentialsHook {
     }
 
     double getSellPrice(ItemStack sellItem) {
+//        BigDecimal price = essentials.getWorth().getPrice(sellItem);
         try {
             Worth worth = essentials.getWorth();
             BigDecimal price;
