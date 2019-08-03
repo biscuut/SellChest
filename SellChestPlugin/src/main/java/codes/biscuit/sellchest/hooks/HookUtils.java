@@ -1,18 +1,20 @@
 package codes.biscuit.sellchest.hooks;
 
 import codes.biscuit.sellchest.SellChest;
-import com.sun.org.apache.regexp.internal.RE;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.bukkit.Bukkit.getServer;
 
 public class HookUtils {
 
@@ -23,7 +25,11 @@ public class HookUtils {
 
     public HookUtils(SellChest main) {
         this.main = main;
-        economy = main.getServer().getServicesManager().getRegistration(Economy.class).getProvider();
+        boolean foundEconomy = setupEconomy();
+        if (!foundEconomy) {
+            main.getLogger().severe("Didn't get the economy registration!");
+            main.getPluginLoader().disablePlugin(main);
+        }
         PluginManager pm = main.getServer().getPluginManager();
         if (pm.getPlugin("MassiveCore") != null &&
                 pm.getPlugin("Factions") != null) {
@@ -56,6 +62,19 @@ public class HookUtils {
             if (main.getMinecraftVersion() >= 14) {
             enabledHooks.put(Hooks.MINECRAFT_1_14, new Minecraft_1_14());
         }
+    }
+
+    private boolean setupEconomy() {
+        if (Bukkit.getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        economy = rsp.getProvider();
+        return economy != null;
     }
 
     public double getValue(ItemStack sellItem, Player p) {

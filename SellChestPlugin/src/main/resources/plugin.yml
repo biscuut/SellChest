@@ -5,7 +5,7 @@ main: codes.biscuit.sellchest.SellChest
 author: Biscut
 description: Automatically sells all items that enter a sellchest.
 depend: [Vault]
-softdepend: [ShopGUIPlus, PlotSquared, Factions, MassiveCore, Essentials, ASkyBlock]
+softdepend: [Multiverse-Core, Vault, ShopGUIPlus, PlotSquared, Factions, MassiveCore, Essentials, ASkyBlock]
 commands:
   sellchest:
     description: The main sellchest command.

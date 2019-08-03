@@ -73,13 +73,14 @@ public class Utils {
             while (entryIterator.hasNext()) {
                 Map.Entry<Location, UUID> locationEntry = entryIterator.next();
                 OfflinePlayer offlineP = main.getServer().getOfflinePlayer(locationEntry.getValue());
-                Location loc = locationEntry.getKey();
-                if (loc == null) {
+                Location loc;
+                Block block;
+                try {
+                    loc = locationEntry.getKey();
+                    block = loc.getBlock();
+                } catch (NullPointerException ex) {
+                    ex.printStackTrace();
                     entryIterator.remove();
-                    continue;
-                }
-                Block block = loc.getBlock();
-                if (block == null) {
                     continue;
                 }
                 if (block.getType() == Material.CHEST) {
@@ -124,11 +125,13 @@ public class Utils {
             for (Map.Entry<Location, UUID> entry : chestLocations.entrySet()) {
                 Location loc = entry.getKey();
                 UUID uuid = entry.getValue();
-                String serializedLoc = loc.getWorld().getName() + "|" + loc.getBlockX() + "|" + loc.getBlockY() + "|" + loc.getBlockZ();
-                String uuidString = uuid.toString();
-                List<String> locationList = main.getConfigValues().getLocationsConfig().getStringList("locations." + uuidString);
-                locationList.add(serializedLoc);
-                main.getConfigValues().getLocationsConfig().set("locations." + uuidString, locationList);
+                if (loc != null && uuid != null) {
+                    String serializedLoc = loc.getWorld().getName() + "|" + loc.getBlockX() + "|" + loc.getBlockY() + "|" + loc.getBlockZ();
+                    String uuidString = uuid.toString();
+                    List<String> locationList = main.getConfigValues().getLocationsConfig().getStringList("locations." + uuidString);
+                    locationList.add(serializedLoc);
+                    main.getConfigValues().getLocationsConfig().set("locations." + uuidString, locationList);
+                }
             }
             main.getConfigValues().getLocationsConfig().save(main.getConfigValues().getLocationsFile());
             main.getConfigValues().getLocationsConfig().set("locations", null);

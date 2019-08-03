@@ -26,17 +26,19 @@ public class SellChest extends JavaPlugin {
         utils = new Utils(this);
         utils.updateConfig(this);
         hookUtils =  new HookUtils(this);
-        Bukkit.getPluginManager().registerEvents(new PlayerListener(this), this);
-        configValues.setupSellChests();
-        new MetricsLite(this);
-        if (minecraftVersion == -1) {
-            minecraftVersion = Integer.valueOf(Bukkit.getBukkitVersion().split(Pattern.quote("-"))[0].split(Pattern.quote("."))[1]);
+        if (isEnabled()) {
+            Bukkit.getPluginManager().registerEvents(new PlayerListener(this), this);
+            configValues.setupSellChests();
+            new MetricsLite(this);
+            if (minecraftVersion == -1) {
+                minecraftVersion = Integer.valueOf(Bukkit.getBukkitVersion().split(Pattern.quote("-"))[0].split(Pattern.quote("."))[1]);
+            }
         }
     }
 
     @Override
     public void onDisable() {
-        getLogger().info("Saved sellchest locations!");
+        getLogger().info("Saving sellchest locations!");
         utils.saveChestLocations();
     }
 
